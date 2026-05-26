@@ -261,6 +261,57 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
         <option value="في كلا الساقين">في كلا الساقين</option>
       </select>
     </div>
+    <!-- Body Chart -->
+    <div class="field">
+      <label>حدد مكان الألم على الرسم</label>
+      <div style="background:var(--deep);border-radius:10px;padding:14px;text-align:center">
+        <svg width="200" height="320" viewBox="0 0 200 320" style="max-width:100%">
+          <!-- Body outline back view -->
+          <ellipse cx="100" cy="30" rx="22" ry="26" fill="none" stroke="#3A4D64" stroke-width="2"/>
+          <!-- Neck -->
+          <rect x="88" y="54" width="24" height="16" rx="4" fill="none" stroke="#3A4D64" stroke-width="2"/>
+          <!-- Torso -->
+          <path d="M65,70 L55,140 L60,200 L140,200 L145,140 L135,70 Z" fill="none" stroke="#3A4D64" stroke-width="2"/>
+          <!-- Arms -->
+          <path d="M65,75 L40,130 L45,160" fill="none" stroke="#3A4D64" stroke-width="2"/>
+          <path d="M135,75 L160,130 L155,160" fill="none" stroke="#3A4D64" stroke-width="2"/>
+          <!-- Pelvis -->
+          <path d="M60,200 L55,230 L145,230 L140,200" fill="none" stroke="#3A4D64" stroke-width="2"/>
+          <!-- Legs -->
+          <path d="M75,230 L70,310" fill="none" stroke="#3A4D64" stroke-width="2"/>
+          <path d="M125,230 L130,310" fill="none" stroke="#3A4D64" stroke-width="2"/>
+
+          <!-- CLICKABLE ZONES -->
+          <!-- Lower Back zone -->
+          <rect id="zone-back" x="70" y="155" width="60" height="40" rx="6" fill="rgba(0,212,168,0.15)" stroke="#00D4A8" stroke-width="1.5" stroke-dasharray="4,2" style="cursor:pointer" onclick="toggleZone('back','في الظهر فقط')"/>
+          <text x="100" y="179" text-anchor="middle" font-size="9" fill="#00D4A8" font-family="Cairo">ظهر</text>
+
+          <!-- Buttock/Hip zone -->
+          <rect id="zone-buttock" x="65" y="200" width="70" height="28" rx="6" fill="rgba(61,142,245,0.1)" stroke="#3A4D64" stroke-width="1.5" stroke-dasharray="4,2" style="cursor:pointer" onclick="toggleZone('buttock','الأرداف')"/>
+          <text x="100" y="218" text-anchor="middle" font-size="9" fill="#6B82A0" font-family="Cairo">أرداف</text>
+
+          <!-- Left thigh -->
+          <rect id="zone-lthigh" x="62" y="232" width="30" height="35" rx="5" fill="rgba(61,142,245,0.1)" stroke="#3A4D64" stroke-width="1.5" stroke-dasharray="4,2" style="cursor:pointer" onclick="toggleZone('lthigh','فخذ يسار')"/>
+          <text x="77" y="253" text-anchor="middle" font-size="8" fill="#6B82A0" font-family="Cairo">فخذ</text>
+
+          <!-- Right thigh -->
+          <rect id="zone-rthigh" x="108" y="232" width="30" height="35" rx="5" fill="rgba(61,142,245,0.1)" stroke="#3A4D64" stroke-width="1.5" stroke-dasharray="4,2" style="cursor:pointer" onclick="toggleZone('rthigh','فخذ يمين')"/>
+          <text x="123" y="253" text-anchor="middle" font-size="8" fill="#6B82A0" font-family="Cairo">فخذ</text>
+
+          <!-- Left leg below knee -->
+          <rect id="zone-lleg" x="62" y="272" width="28" height="35" rx="5" fill="rgba(240,64,64,0.1)" stroke="#3A4D64" stroke-width="1.5" stroke-dasharray="4,2" style="cursor:pointer" onclick="toggleZone('lleg','ساق يسار تحت الركبة')"/>
+          <text x="76" y="293" text-anchor="middle" font-size="7" fill="#6B82A0" font-family="Cairo">ساق</text>
+
+          <!-- Right leg below knee -->
+          <rect id="zone-rleg" x="110" y="272" width="28" height="35" rx="5" fill="rgba(240,64,64,0.1)" stroke="#3A4D64" stroke-width="1.5" stroke-dasharray="4,2" style="cursor:pointer" onclick="toggleZone('rleg','ساق يمين تحت الركبة')"/>
+          <text x="124" y="293" text-anchor="middle" font-size="7" fill="#6B82A0" font-family="Cairo">ساق</text>
+
+          <!-- Labels -->
+          <text x="100" y="130" text-anchor="middle" font-size="8" fill="#3A4D64" font-family="Cairo">← اضغط على منطقة الألم</text>
+        </svg>
+        <div id="pain-zones-display" style="font-size:0.72rem;color:var(--teal);margin-top:6px;min-height:18px"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -323,18 +374,37 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 <div class="screen" id="sc-d1">
   <div class="s-eye doc">Step 1 of 3 · McKenzie MDT</div>
   <div class="s-title">Directional Preference</div>
-  <div class="s-sub">Identify the direction that most consistently reduces or centralises symptoms.</div>
+  <div class="s-sub">Perform repeated end-range movement testing. Identify the direction that most consistently reduces or centralises symptoms.</div>
   <div id="pt-sum-d1"></div>
-  <div class="card"><div class="card-lbl">Direction · Kilpikoski et al. (2002) κ=0.69</div><div id="dir-box"></div></div>
-  <div class="card"><div class="card-lbl">Symptom Response · Werneke et al. (1999) κ=0.84</div><div id="resp-box"></div></div>
+  <div class="card"><div class="card-lbl">Direction of Preference · Kilpikoski et al. (2002) κ=0.69</div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">Ask patient to perform 10 repeated end-range movements in each direction. Note which direction reduces, centralises or abolishes symptoms.</span></div>
+    <div id="dir-box"></div>
+  </div>
+  <div class="card"><div class="card-lbl">Symptom Response · Werneke et al. (1999) κ=0.84</div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">Centralisation: distal symptoms moving proximally toward lumbar spine. Peripheralisation: symptoms spreading distally — contraindication to continuing that direction.</span></div>
+    <div id="resp-box"></div>
+  </div>
+  <div class="card"><div class="card-lbl">Overall Interpretation · Repeated Movement Testing</div>
+    <div id="overall-box"></div>
+  </div>
 </div>
 
 <!-- D2: Syndrome + Mechanism -->
 <div class="screen" id="sc-d2">
   <div class="s-eye doc">Step 2 of 3 · Classification</div>
   <div class="s-title">Syndrome & Mechanism</div>
-  <div class="card"><div class="card-lbl">MDT Syndrome · Hefford (2008) κ=0.60</div><div id="syn-box"></div></div>
-  <div class="card"><div class="card-lbl">Primary Mechanism · Foster et al. (2013)</div><div id="mech-box"></div></div>
+  <div class="s-sub">Based on the repeated movement assessment — classify the patient's mechanical presentation.</div>
+  <div class="card">
+    <div class="card-lbl">MDT Syndrome Classification · Hefford (2008) κ=0.60</div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">Derangement: clear DP + centralisation (50–78% of NSLBP). Dysfunction: end-range pain only, no DP. Postural: pain from sustained posture only. Other: does not fit mechanical patterns.</span></div>
+    <div id="syn-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-lbl">Primary Pain Mechanism · Foster et al. (2013)</div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">Select the PRIMARY driver of this patient's pain and disability. This determines the treatment approach.</span></div>
+    <div id="mech-detail-box"></div>
+    <div id="mech-box"></div>
+  </div>
 </div>
 
 <!-- D3: X-Ray -->
@@ -393,8 +463,28 @@ const supa = {
 // STATE
 // ════════════════════════════════════
 let mode = 'home', pStep = 0, dStep = 0;
+const painZones = new Set();
+
+function toggleZone(id, label) {
+  const elem = document.getElementById('zone-'+id);
+  if(painZones.has(id)) {
+    painZones.delete(id);
+    elem.style.fill = id==='back'?'rgba(0,212,168,0.1)': id==='lleg'||id==='rleg'?'rgba(240,64,64,0.1)':'rgba(61,142,245,0.1)';
+    elem.style.strokeWidth = '1.5';
+    elem.setAttribute('stroke','#3A4D64');
+  } else {
+    painZones.add(id);
+    elem.style.fill = id==='back'?'rgba(0,212,168,0.4)': id==='lleg'||id==='rleg'?'rgba(240,64,64,0.35)':'rgba(61,142,245,0.3)';
+    elem.style.strokeWidth = '2.5';
+    elem.setAttribute('stroke', id==='back'?'#00D4A8': id==='lleg'||id==='rleg'?'#F04040':'#3D8EF5');
+  }
+  const labels = {'back':'الظهر','buttock':'الأرداف','lthigh':'الفخذ الأيسر','rthigh':'الفخذ الأيمن','lleg':'الساق اليسرى تحت الركبة','rleg':'الساق اليمنى تحت الركبة'};
+  const selected = [...painZones].map(z=>labels[z]).join(' · ');
+  document.getElementById('pain-zones-display').textContent = selected || 'لم يتم تحديد منطقة بعد';
+  P.dist = selected || document.getElementById('p-dist').value;
+}
 const P = { name:'', age:'', gender:'', dur:'', pain:'', dist:'', rf:new Array(5).fill(null), start:new Array(9).fill(null), id:null };
-const D = { dir:null, resp:null, syndrome:null, mech:null, xray:new Set(), xrayAvail:null };
+const D = { dir:null, resp:null, overall:null, syndrome:null, mech:null, xray:new Set(), xrayAvail:null };
 
 // ════════════════════════════════════
 // DATA
@@ -438,10 +528,29 @@ const synData = [
   { id:'other',        c:'s-a', title:'Other / Non-Mechanical', desc:'Stenosis / SIJ / Inflammatory — consider referral', ref:'Foster et al. (2013)' },
 ];
 const mechData = [
-  { id:'mdt',   c:'s-t', title:'Mechanical / MDT', desc:'Responds to directional exercise.', ref:'Foster et al. (2013)' },
-  { id:'patho', c:'s-b', title:'Pathoanatomical', desc:'Identifiable anatomical source.', ref:'Foster et al. (2013)' },
-  { id:'cft',   c:'s-a', title:'Psychosocial / CFT', desc:'Fear-avoidance dominant. NOT for red flags.', ref:"O'Sullivan et al. (2018)" },
-  { id:'tbc',   c:'s-b', title:'Treatment-Based (TBC)', desc:'Manipulation / Stabilisation / Traction.', ref:'Fritz et al. (2003)' },
+  { id:'mdt', c:'s-t', title:'Mechanical / MDT-Based',
+    desc:'Symptoms change with movement and postures. Clear directional response on repeated movement testing. Patient responds to directional exercise programme.',
+    criteria:'DP present · Centralisation or improvement with loading · Symptoms vary with position',
+    ref:'Foster et al. (2013) · Long et al. Spine (2004)' },
+  { id:'patho', c:'s-b', title:'Pathoanatomical / Structural',
+    desc:'Identifiable anatomical source of pain — disc, facet joint, SIJ, or nerve root. Treatment directed at specific structure.',
+    criteria:'Specific anatomical findings · Positive structural tests · Imaging correlation',
+    ref:'Foster et al. (2013) · Karayannis et al. (2012)' },
+  { id:'cft', c:'s-a', title:'Psychosocial / CFT',
+    desc:'Fear-avoidance beliefs, catastrophising, or depression are the PRIMARY barrier to recovery. NOT appropriate for red flags or acute radiculopathy.',
+    criteria:'High STarT Back subscale · Catastrophising · Fear of movement · Depression/anxiety dominant',
+    ref:"O'Sullivan et al. PT (2018) · Foster et al. (2013)" },
+  { id:'tbc', c:'s-b', title:'Treatment-Based Classification (TBC)',
+    desc:'Classify by predicted responsiveness to specific intervention: Manipulation, Stabilisation, Traction, or Specific Exercise.',
+    criteria:'Manipulation: acute + asymmetric AROM + no neuro signs · Stabilisation: chronic + instability signs · Traction: leg pain + peripheralisation',
+    ref:'Fritz et al. Spine (2003) · Childs et al. Ann Intern Med (2004)' },
+];
+
+const overallData = [
+  { id:'improved', c:'s-t', title:'✅ Improved', desc:'Symptoms reduced or centralised with repeated movement. Continue this direction and progress loading.' },
+  { id:'worsened', c:'s-r', title:'⚠ Worsened / Peripheralised', desc:'Symptoms increased or spread distally. STOP this direction. Reassess or try opposite direction.' },
+  { id:'nochange', c:'s-b', title:'No Change', desc:'No meaningful change in symptoms. Consider alternative direction or stabilisation approach.' },
+  { id:'partial',  c:'s-b', title:'Partial / Inconsistent', desc:'Some improvement but not consistent. May need more sessions to establish clear pattern.' },
 ];
 const xrayData = [
   { id:'disc',    title:'Disc Space Narrowing', ref:'Brinjikji et al. (2015)', urgent:false },
@@ -589,7 +698,7 @@ async function loadPatient() {
   dStep=1;
   document.getElementById('prog-bar').style.display='block';
   showScreen('sc-d1');
-  renderProgD(); renderPtSum('pt-sum-d1'); renderDir(); renderResp(); renderSyn(); renderMech(); renderXray();
+  renderProgD(); renderPtSum('pt-sum-d1'); renderDir(); renderResp(); renderOverall(); renderSyn(); renderMech(); renderXray();
   updateBot();
 }
 
@@ -651,11 +760,43 @@ function renderSyn() {
       <div class="sel-body"><div class="sel-title">${s.title}</div><div class="sel-desc">${s.desc}</div><div class="sel-ref">📚 ${s.ref}</div></div>
     </div>`).join('');
 }
+function renderOverall() {
+  const box = document.getElementById('overall-box');
+  if(!box) return;
+  box.innerHTML = overallData.map(o=>`
+    <div class="sel ${D.overall===o.id?o.c:''}" onclick="D.overall='${o.id}';renderOverall()">
+      <div class="sel-radio"></div>
+      <div class="sel-body">
+        <div class="sel-title">${o.title}</div>
+        <div class="sel-desc">${o.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
 function renderMech() {
+  // Show mechanism detail guide
+  const detailBox = document.getElementById('mech-detail-box');
+  if(detailBox) {
+    detailBox.innerHTML = `
+    <div style="background:var(--deep);border-radius:9px;padding:11px 13px;margin-bottom:10px">
+      <div style="font-family:'DM Mono',monospace;font-size:0.56rem;color:var(--muted);letter-spacing:1px;margin-bottom:8px">SELECTION GUIDE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:0.68rem">
+        <div style="background:var(--td);border-radius:7px;padding:7px 9px;color:var(--teal)"><strong>Mechanical:</strong> DP present + symptoms change with movement</div>
+        <div style="background:var(--bd);border-radius:7px;padding:7px 9px;color:var(--blue)"><strong>Pathoanatomical:</strong> specific structure identified on exam/imaging</div>
+        <div style="background:var(--ad);border-radius:7px;padding:7px 9px;color:var(--amber)"><strong>Psychosocial/CFT:</strong> fear/catastrophising dominant — High STarT Back subscale</div>
+        <div style="background:var(--raised);border-radius:7px;padding:7px 9px;color:var(--dim)"><strong>TBC:</strong> specific treatment category predicts response</div>
+      </div>
+    </div>`;
+  }
   document.getElementById('mech-box').innerHTML=mechData.map(m=>`
     <div class="sel ${D.mech===m.id?m.c:''}" onclick="D.mech='${m.id}';renderMech()">
       <div class="sel-radio"></div>
-      <div class="sel-body"><div class="sel-title">${m.title}</div><div class="sel-desc">${m.desc}</div><div class="sel-ref">📚 ${m.ref}</div></div>
+      <div class="sel-body">
+        <div class="sel-title">${m.title}</div>
+        <div class="sel-desc">${m.desc}</div>
+        ${D.mech===m.id?`<div style="background:var(--raised);border-radius:6px;padding:5px 8px;margin-top:5px;font-size:0.65rem;color:var(--dim)">✅ Clinical criteria: ${m.criteria}</div>`:''}
+        <div class="sel-ref">📚 ${m.ref}</div>
+      </div>
     </div>`).join('');
 }
 
@@ -683,6 +824,33 @@ function toggleX(id){D.xray.has(id)?D.xray.delete(id):D.xray.add(id);renderXray(
 // ════════════════════════════════════
 // RESULT ENGINE
 // ════════════════════════════════════
+async function saveDoctorData(proto, protoName) {
+  const {total,sub}=calcStart();
+  const risk=total<=3?'Low Risk':sub<=3?'Medium Risk':'High Risk';
+  await fetch(`${SUPA_URL}/rest/v1/sessions?id=eq.${P.id}`, {
+    method: 'PATCH',
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': `Bearer ${SUPA_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      doc_dir: D.dir,
+      doc_response: D.resp,
+      doc_overall: D.overall,
+      doc_syndrome: D.syndrome,
+      doc_mechanism: D.mech,
+      doc_xray: [...D.xray],
+      doc_xray_avail: D.xrayAvail,
+      final_protocol: proto,
+      final_protocol_name: protoName,
+      assessment_complete: true,
+      assessed_at: new Date().toISOString()
+    })
+  });
+}
+
 function buildResult() {
   const {total,sub}=calcStart();
   const risk=total<=3?'low':sub<=3?'med':'high';
@@ -742,6 +910,9 @@ function buildResult() {
       {ico:'👥',lbl:'MDT Collaboration',txt:'Coordinate with psychologist if indicated.'},
     ];
   }
+
+  // Save doctor assessment to Supabase
+  saveDoctorData(proto, protoName);
 
   const riskLabel={low:'LOW',med:'MEDIUM',high:'HIGH'}[risk];
   const dirLbl={ext:'Extension',flex:'Flexion',lat:'Lateral',none:'None'}[D.dir]||'—';
@@ -818,7 +989,9 @@ async function goNext() {
     }
   } else if(mode==='doctor'){
     if(dStep===1){
-      if(!D.dir||!D.resp){alert('Select Direction AND Response');return;}
+      if(!D.dir){alert('Select Directional Preference');return;}
+      if(!D.resp){alert('Select Symptom Response');return;}
+      if(!D.overall){alert('Select Overall Interpretation');return;}
       dStep=2; showScreen('sc-d2'); renderProgD();
     } else if(dStep===2){
       if(!D.syndrome||!D.mech){alert('Select syndrome AND mechanism');return;}
@@ -837,11 +1010,17 @@ async function goNext() {
 
 function goBack() {
   if(mode==='patient'){
-    if(pStep>1){pStep--;showScreen('sc-p'+pStep);renderProgP();}
+    if(pStep===2){pStep=1;showScreen('sc-p1');renderProgP();}
+    else if(pStep===3){pStep=2;showScreen('sc-p2');renderProgP();}
     else{goHome();}
   } else if(mode==='doctor'){
-    if(dStep>1){dStep--;showScreen('sc-d'+dStep);renderProgD();}
-    else{dStep=0;showScreen('sc-d0');document.getElementById('prog-bar').style.display='none';}
+    if(dStep===1){dStep=0;showScreen('sc-d0');document.getElementById('prog-bar').style.display='none';}
+    else if(dStep===2){dStep=1;showScreen('sc-d1');renderProgD();renderPtSum('pt-sum-d1');renderDir();renderResp();renderOverall();}
+    else if(dStep===3){dStep=2;showScreen('sc-d2');renderProgD();renderSyn();renderMech();}
+    else if(dStep===4){dStep=3;showScreen('sc-d3');renderProgD();renderXray();
+      // Restore bot bar
+      document.getElementById('bot-bar').innerHTML='<button class="btn-back" id="btn-back" onclick="goBack()">← Back</button><button class="btn-doc" id="btn-next" onclick="goNext()">Next →</button>';
+    }
   }
   updateBot();
 }
