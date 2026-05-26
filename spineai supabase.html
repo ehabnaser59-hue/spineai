@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpineAI — نظام تقييم ألم الظهر</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Cairo:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#070910; --deep:#0C1018; --surf:#111827; --raised:#182030;
+  --bord:#1E2D42; --muted:#3A4D64; --dim:#6B82A0; --text:#B8CCDE; --bright:#E8F2FF;
+  --teal:#00D4A8; --td:#083328;
+  --blue:#3D8EF5; --bd:#081C3A;
+  --red:#F04040; --rd:#2A0808;
+  --amber:#F0A020; --ad:#2A1800;
+  --green:#20C060; --gd:#082018;
+  --purple:#9B6FE8; --pd:#180E30;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--void);font-family:'Cairo',sans-serif;color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(0,212,168,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,168,0.02) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+
+.hdr{position:sticky;top:0;z-index:100;background:rgba(7,9,16,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--bord);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:54px;}
+.logo{display:flex;align-items:center;gap:9px;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--teal),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;}
+.logo-name{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:800;color:var(--bright);}
+.logo-tag{font-family:'DM Mono',monospace;font-size:0.54rem;color:var(--muted);letter-spacing:1px;}
+.mode-badge{font-family:'DM Mono',monospace;font-size:0.58rem;padding:3px 10px;border-radius:20px;letter-spacing:1px;}
+.mode-p{background:var(--td);color:var(--teal);border:1px solid rgba(0,212,168,0.25);}
+.mode-d{background:var(--bd);color:var(--blue);border:1px solid rgba(61,142,245,0.25);}
+
+.main{max-width:620px;margin:0 auto;padding:24px 14px 90px;position:relative;z-index:1;}
+.screen{display:none;animation:fu 0.22s ease;}
+.screen.active{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* HOME */
+.home-hero{text-align:center;padding:44px 16px 36px;}
+.home-icon{font-size:3.2rem;margin-bottom:14px;display:block;}
+.home-title{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--bright);margin-bottom:7px;}
+.home-sub{font-size:0.82rem;color:var(--dim);line-height:1.7;max-width:380px;margin:0 auto 28px;}
+.home-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px;margin:0 auto;}
+.hbtn{border-radius:14px;padding:20px 14px;text-align:center;cursor:pointer;transition:all 0.2s;border:2px solid;}
+.hbtn:hover{transform:translateY(-2px);}
+.hbtn-p{background:var(--td);border-color:var(--teal);}
+.hbtn-d{background:var(--bd);border-color:var(--blue);}
+.hbtn-icon{font-size:1.8rem;display:block;margin-bottom:7px;}
+.hbtn-title{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:800;}
+.hbtn-p .hbtn-title{color:var(--teal);}
+.hbtn-d .hbtn-title{color:var(--blue);}
+.hbtn-sub{font-size:0.68rem;color:var(--dim);margin-top:3px;}
+
+/* PROGRESS */
+.prog{background:var(--deep);border-bottom:1px solid var(--bord);padding:9px 14px 12px;display:none;}
+.prog-row{display:flex;align-items:flex-start;max-width:560px;margin:0 auto;}
+.pd{display:flex;flex-direction:column;align-items:center;flex:1;}
+.pd-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:0.58rem;font-weight:600;background:var(--surf);border:2px solid var(--bord);color:var(--muted);transition:all 0.3s;}
+.pd-dot.done{background:var(--teal);border-color:var(--teal);color:var(--void);}
+.pd-dot.active{background:var(--td);border-color:var(--teal);color:var(--teal);}
+.pd-dot.d-active{background:var(--bd);border-color:var(--blue);color:var(--blue);}
+.pd-dot.d-done{background:var(--blue);border-color:var(--blue);color:var(--void);}
+.pd-lbl{font-size:0.54rem;color:var(--muted);margin-top:3px;text-align:center;line-height:1.3;}
+.pd-lbl.active{color:var(--teal);}
+.pd-lbl.d-active{color:var(--blue);}
+.pd-con{height:2px;flex:1;background:var(--bord);margin-bottom:18px;margin-top:11px;transition:background 0.3s;}
+.pd-con.done{background:var(--teal);}
+.pd-con.d-done{background:var(--blue);}
+
+/* SCREEN HEADER */
+.s-eye{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.s-eye.pat{color:var(--teal);}
+.s-eye.doc{color:var(--blue);}
+.s-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--bright);margin-bottom:4px;}
+.s-sub{font-size:0.78rem;color:var(--dim);line-height:1.6;margin-bottom:20px;}
+
+/* CARD */
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:13px;padding:15px;margin-bottom:12px;}
+.card-lbl{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.card-lbl::after{content:'';flex:1;height:1px;background:var(--bord);}
+
+/* FIELD */
+.field{margin-bottom:11px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:0.73rem;font-weight:700;color:var(--dim);margin-bottom:4px;}
+.field input,.field select{width:100%;padding:9px 12px;background:var(--deep);border:1px solid var(--bord);border-radius:8px;color:var(--bright);font-family:'Cairo',sans-serif;font-size:0.82rem;outline:none;transition:border-color 0.2s;}
+.field input:focus,.field select:focus{border-color:var(--teal);}
+.field select option{background:var(--deep);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+
+/* QUESTION */
+.q-item{background:var(--deep);border:1.5px solid var(--bord);border-radius:10px;padding:12px 13px;margin-bottom:7px;transition:border-color 0.2s;}
+.q-item.answered{border-color:rgba(0,212,168,0.3);}
+.q-num{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;}
+.q-text{font-size:0.86rem;font-weight:700;color:var(--bright);line-height:1.5;margin-bottom:7px;}
+.q-opts{display:flex;gap:6px;flex-wrap:wrap;}
+.q-btn{flex:1;min-width:50px;padding:7px 7px;border-radius:7px;border:1px solid var(--bord);background:var(--surf);font-family:'Cairo',sans-serif;font-size:0.76rem;font-weight:600;cursor:pointer;color:var(--muted);transition:all 0.15s;}
+.q-btn:hover{border-color:var(--teal);color:var(--teal);}
+.q-btn.sel-y{background:var(--gd);border-color:var(--green);color:var(--green);}
+.q-btn.sel-n{background:var(--raised);border-color:var(--muted);color:var(--dim);}
+.q-btn.sel-o{background:var(--bd);border-color:var(--blue);color:var(--blue);}
+
+/* SEL */
+.sel{background:var(--deep);border:1.5px solid var(--bord);border-radius:11px;padding:11px 13px;margin-bottom:8px;cursor:pointer;transition:all 0.18s;display:flex;align-items:flex-start;gap:10px;}
+.sel:hover{border-color:var(--blue);}
+.sel.s-t{border-color:var(--teal);background:var(--td);}
+.sel.s-b{border-color:var(--blue);background:var(--bd);}
+.sel.s-r{border-color:var(--red);background:var(--rd);}
+.sel.s-a{border-color:var(--amber);background:var(--ad);}
+.sel-radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--bord);flex-shrink:0;margin-top:2px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+.sel.s-t .sel-radio{border-color:var(--teal);background:var(--teal);}
+.sel.s-b .sel-radio{border-color:var(--blue);background:var(--blue);}
+.sel.s-r .sel-radio{border-color:var(--red);background:var(--red);}
+.sel.s-a .sel-radio{border-color:var(--amber);background:var(--amber);}
+.sel-radio::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--void);display:none;}
+.sel.s-t .sel-radio::after,.sel.s-b .sel-radio::after,.sel.s-r .sel-radio::after,.sel.s-a .sel-radio::after{display:block;}
+.sel-body{flex:1;}
+.sel-title{font-size:0.85rem;font-weight:700;color:var(--bright);margin-bottom:2px;}
+.sel.s-t .sel-title{color:var(--teal);}
+.sel.s-b .sel-title{color:var(--blue);}
+.sel.s-r .sel-title{color:var(--red);}
+.sel.s-a .sel-title{color:var(--amber);}
+.sel-desc{font-size:0.7rem;color:var(--dim);line-height:1.5;}
+.sel-ref{font-family:'DM Mono',monospace;font-size:0.55rem;color:var(--muted);margin-top:4px;}
+
+/* ALERT */
+.alert{border-radius:9px;padding:10px 13px;margin-bottom:11px;display:flex;gap:8px;font-size:0.76rem;line-height:1.6;}
+.a-r{background:var(--rd);border:1px solid rgba(240,64,64,0.3);color:#F5A8A8;}
+.a-t{background:var(--td);border:1px solid rgba(0,212,168,0.3);color:#8FEDD5;}
+.a-b{background:var(--bd);border:1px solid rgba(61,142,245,0.25);color:#A0C8FF;}
+.a-a{background:var(--ad);border:1px solid rgba(240,160,32,0.3);color:#F5CCA0;}
+
+/* ID CARD */
+.id-card{background:linear-gradient(135deg,var(--deep),var(--surf));border:2px solid var(--teal);border-radius:18px;padding:28px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden;}
+.id-card::before{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,168,0.1) 0%,transparent 70%);}
+.id-lbl{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:2px;color:var(--muted);margin-bottom:10px;}
+.id-num{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:var(--teal);letter-spacing:6px;margin-bottom:7px;}
+.id-sub{font-size:0.78rem;color:var(--dim);line-height:1.6;}
+
+/* DOC ID ENTRY */
+.id-entry{text-align:center;padding:16px 0;}
+.id-entry-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--bright);margin-bottom:5px;}
+.id-entry-sub{font-size:0.76rem;color:var(--dim);margin-bottom:16px;}
+.id-input{width:100%;max-width:260px;padding:13px 18px;background:var(--deep);border:2px solid var(--bord);border-radius:11px;color:var(--bright);font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;text-align:center;letter-spacing:4px;outline:none;transition:border-color 0.2s;}
+.id-input:focus{border-color:var(--blue);}
+.id-load-btn{margin-top:12px;padding:11px 28px;background:linear-gradient(135deg,var(--blue),var(--purple));color:var(--void);border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;}
+
+/* PT SUMMARY */
+.pt-sum{background:var(--surf);border:1px solid var(--bord);border-radius:11px;padding:13px 15px;margin-bottom:13px;}
+.pt-sum-head{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:2px;color:var(--teal);margin-bottom:9px;text-transform:uppercase;}
+.pt-sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.pt-sum-item{background:var(--deep);border-radius:7px;padding:7px 9px;}
+.pt-sum-lbl{font-size:0.6rem;color:var(--muted);margin-bottom:2px;}
+.pt-sum-val{font-size:0.8rem;font-weight:700;color:var(--bright);}
+.start-result{background:var(--deep);border-radius:9px;padding:11px 13px;margin-top:9px;display:flex;align-items:center;gap:11px;}
+.start-score{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;line-height:1;}
+.start-risk-lbl{font-size:0.66rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.start-desc{font-size:0.7rem;color:var(--dim);}
+
+/* RESULT */
+.res-hero{background:linear-gradient(135deg,var(--deep),var(--surf));border:1px solid var(--bord);border-radius:15px;padding:22px;margin-bottom:13px;text-align:center;}
+.res-pt{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);margin-bottom:7px;}
+.res-lbl{font-size:0.65rem;color:var(--teal);font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.res-num{font-family:'Syne',sans-serif;font-size:2.8rem;font-weight:800;color:var(--bright);line-height:1;}
+.res-name{font-size:0.95rem;font-weight:700;color:var(--teal);margin-top:4px;}
+.res-sessions{font-size:0.72rem;color:var(--dim);margin-top:3px;}
+.res-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px;}
+.r-chip{background:var(--surf);border:1px solid var(--bord);border-radius:9px;padding:9px 6px;text-align:center;}
+.r-chip-lbl{font-family:'DM Mono',monospace;font-size:0.53rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.r-chip-val{font-size:0.78rem;font-weight:700;}
+.plan-card{background:var(--surf);border:1px solid var(--bord);border-radius:11px;padding:14px;margin-bottom:11px;}
+.plan-head{font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:700;color:var(--bright);margin-bottom:11px;}
+.plan-item{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--bord);align-items:flex-start;}
+.plan-item:last-child{border-bottom:none;}
+.plan-ico{font-size:0.88rem;flex-shrink:0;margin-top:1px;}
+.plan-text{font-size:0.77rem;line-height:1.6;color:var(--text);}
+.plan-lbl{font-weight:700;display:block;margin-bottom:1px;color:var(--bright);}
+
+/* LOADING */
+.loading{text-align:center;padding:40px 20px;}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--bord);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* BOTTOM BAR */
+.bot{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(7,9,16,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--bord);padding:9px 14px;display:none;gap:8px;max-width:620px;margin:0 auto;}
+.btn-back{flex:0 0 70px;padding:10px;border-radius:9px;border:1px solid var(--bord);background:transparent;font-family:'Cairo',sans-serif;font-size:0.78rem;font-weight:700;color:var(--dim);cursor:pointer;}
+.btn-next{flex:1;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--teal),var(--blue));color:var(--void);font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;}
+.btn-doc{flex:1;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--blue),var(--purple));color:var(--void);font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;}
+.btn-new{flex:1;padding:11px;border-radius:9px;border:1.5px solid var(--teal);background:transparent;color:var(--teal);font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;}
+@media(max-width:480px){.home-btns{grid-template-columns:1fr;}.res-chips{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo">
+    <div class="logo-icon">🏥</div>
+    <div>
+      <div class="logo-name">SpineAI</div>
+      <div class="logo-tag" id="hdr-tag">نظام تقييم ألم الظهر</div>
+    </div>
+  </div>
+  <div class="mode-badge mode-p" id="mode-badge">PATIENT</div>
+</div>
+
+<div class="prog" id="prog-bar"><div class="prog-row" id="prog-row"></div></div>
+
+<div class="main">
+
+<!-- HOME -->
+<div class="screen active" id="sc-home">
+  <div class="home-hero">
+    <span class="home-icon">🏥</span>
+    <div class="home-title">SpineAI</div>
+    <div class="home-sub">نظام تقييم ألم أسفل الظهر — بوابة للمريض وبوابة للمعالج</div>
+    <div class="home-btns">
+      <div class="hbtn hbtn-p" onclick="startPatient()">
+        <span class="hbtn-icon">🧑‍⚕️</span>
+        <div class="hbtn-title">أنا مريض</div>
+        <div class="hbtn-sub">أملأ الاستبيان وأستلم رقمي</div>
+      </div>
+      <div class="hbtn hbtn-d" onclick="startDoctor()">
+        <span class="hbtn-icon">👨‍⚕️</span>
+        <div class="hbtn-title">أنا معالج</div>
+        <div class="hbtn-sub">أدخل رقم المريض وأكمل التقييم</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- P1: بيانات المريض -->
+<div class="screen" id="sc-p1">
+  <div class="s-eye pat">الخطوة ١ من ٣ · بياناتك الشخصية</div>
+  <div class="s-title">أهلاً بك 👋</div>
+  <div class="s-sub">أدخل بياناتك الأساسية — كل المعلومات سرية</div>
+  <div class="card">
+    <div class="card-lbl">البيانات الأساسية</div>
+    <div class="field"><label>اسمك الكامل</label><input type="text" id="p-name" placeholder="أدخل اسمك"></div>
+    <div class="field-row">
+      <div class="field"><label>عمرك</label><input type="number" id="p-age" placeholder="سنة" min="18" max="65"></div>
+      <div class="field"><label>الجنس</label>
+        <select id="p-gender"><option value="">--</option><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select>
+      </div>
+    </div>
+    <div class="field"><label>مدة الألم</label>
+      <select id="p-dur">
+        <option value="">--</option>
+        <option value="حاد (أقل من 6 أسابيع)">أقل من 6 أسابيع</option>
+        <option value="تحت الحاد (6 أسابيع - 3 أشهر)">من 6 أسابيع إلى 3 أشهر</option>
+        <option value="مزمن (أكثر من 3 أشهر)">أكثر من 3 أشهر</option>
+      </select>
+    </div>
+    <div class="field"><label>شدة الألم الآن (0 = بدون ألم، 10 = أشد ألم)</label>
+      <input type="number" id="p-pain" placeholder="0 إلى 10" min="0" max="10">
+    </div>
+    <div class="field"><label>أين تشعر بالألم؟</label>
+      <select id="p-dist">
+        <option value="">--</option>
+        <option value="في الظهر فقط">في الظهر فقط</option>
+        <option value="ينزل للأرداف أو الفخذ">ينزل للأرداف أو الفخذ</option>
+        <option value="ينزل للساق أو القدم">ينزل للساق أو القدم</option>
+        <option value="في كلا الساقين">في كلا الساقين</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- P2: Red Flags -->
+<div class="screen" id="sc-p2">
+  <div class="s-eye pat">الخطوة ٢ من ٣ · أسئلة مهمة</div>
+  <div class="s-title">أسئلة عن صحتك</div>
+  <div class="s-sub">أجب بصدق — هذه الأسئلة مهمة لسلامتك</div>
+  <div class="card"><div class="card-lbl">أسئلة الفحص</div><div id="rf-box"></div></div>
+</div>
+
+<!-- P3: STarT Back -->
+<div class="screen" id="sc-p3">
+  <div class="s-eye pat">الخطوة ٣ من ٣ · استبيان ألم الظهر</div>
+  <div class="s-title">كيف أثّر الألم عليك؟</div>
+  <div class="s-sub">أجب بصدق عن وضعك <strong>خلال الأسبوعين الماضيين</strong></div>
+  <div class="card"><div class="card-lbl">الاستبيان — 9 أسئلة</div><div id="start-box"></div></div>
+</div>
+
+<!-- P4: ID Card -->
+<div class="screen" id="sc-p4">
+  <div class="s-eye pat">انتهيت ✅</div>
+  <div class="s-title">شكراً لك!</div>
+  <div class="s-sub">اكتمل الاستبيان — أعطِ هذا الرقم للمعالج الطبيعي</div>
+  <div class="id-card">
+    <div class="id-lbl">رقم جلستك · SESSION ID</div>
+    <div class="id-num" id="pt-id-display">----</div>
+    <div style="font-size:1.4rem;margin:8px 0">↓</div>
+    <div class="id-sub">أعطِ هذا الرقم للمعالج الطبيعي<br>ليكمل التقييم ويحدد خطة علاجك</div>
+  </div>
+  <div class="alert a-t"><span>✅</span><div>تم تحفظ إجاباتك بنجاح على النظام.</div></div>
+</div>
+
+<!-- LOADING -->
+<div class="screen" id="sc-loading">
+  <div class="loading">
+    <div class="loading-spinner"></div>
+    <div style="font-size:0.85rem;color:var(--dim)" id="loading-msg">جاري الحفظ...</div>
+  </div>
+</div>
+
+<!-- D0: Doctor ID Entry -->
+<div class="screen" id="sc-d0">
+  <div class="s-eye doc">Doctor Portal · بوابة المعالج</div>
+  <div class="s-title">Enter Patient ID</div>
+  <div class="s-sub">Enter the session ID provided by the patient</div>
+  <div class="card">
+    <div class="id-entry">
+      <div class="id-entry-title">Patient Session ID</div>
+      <div class="id-entry-sub">Ask the patient for their 4-digit code</div>
+      <input type="text" class="id-input" id="doc-id-input" placeholder="0000" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+      <br>
+      <button class="id-load-btn" onclick="loadPatient()">Load Patient →</button>
+    </div>
+    <div id="id-error" style="display:none" class="alert a-r"><span>❌</span><span>ID not found. Please check the number.</span></div>
+  </div>
+</div>
+
+<!-- D1: McKenzie -->
+<div class="screen" id="sc-d1">
+  <div class="s-eye doc">Step 1 of 3 · McKenzie MDT</div>
+  <div class="s-title">Directional Preference</div>
+  <div class="s-sub">Identify the direction that most consistently reduces or centralises symptoms.</div>
+  <div id="pt-sum-d1"></div>
+  <div class="card"><div class="card-lbl">Direction · Kilpikoski et al. (2002) κ=0.69</div><div id="dir-box"></div></div>
+  <div class="card"><div class="card-lbl">Symptom Response · Werneke et al. (1999) κ=0.84</div><div id="resp-box"></div></div>
+</div>
+
+<!-- D2: Syndrome + Mechanism -->
+<div class="screen" id="sc-d2">
+  <div class="s-eye doc">Step 2 of 3 · Classification</div>
+  <div class="s-title">Syndrome & Mechanism</div>
+  <div class="card"><div class="card-lbl">MDT Syndrome · Hefford (2008) κ=0.60</div><div id="syn-box"></div></div>
+  <div class="card"><div class="card-lbl">Primary Mechanism · Foster et al. (2013)</div><div id="mech-box"></div></div>
+</div>
+
+<!-- D3: X-Ray -->
+<div class="screen" id="sc-d3">
+  <div class="s-eye doc">Step 3 of 3 · Imaging</div>
+  <div class="s-title">X-Ray Findings</div>
+  <div class="s-sub">Enter findings from radiologist report if available.</div>
+  <div class="card">
+    <div class="card-lbl">Prior X-Ray Available?</div>
+    <div class="sel" id="xyn-yes" onclick="selXYN('yes')"><div class="sel-radio"></div><div class="sel-body"><div class="sel-title">Yes — X-ray available</div><div class="sel-desc">Enter findings below</div></div></div>
+    <div class="sel" id="xyn-no" onclick="selXYN('no')"><div class="sel-radio"></div><div class="sel-body"><div class="sel-title">No — Not available</div><div class="sel-desc">Algorithm uses clinical assessment only</div></div></div>
+  </div>
+  <div id="xray-findings" style="display:none">
+    <div class="alert a-a"><span>ℹ</span><span style="font-size:0.73rem">NICE NG59: Routine X-ray NOT recommended for NSLBP without red flags.</span></div>
+    <div class="card"><div class="card-lbl">Findings Checklist</div><div id="xray-box"></div></div>
+  </div>
+</div>
+
+<!-- D4: Result -->
+<div class="screen" id="sc-d4"><div id="result-box"></div></div>
+
+</div><!-- /main -->
+
+<div class="bot" id="bot-bar">
+  <button class="btn-back" id="btn-back" onclick="goBack()">← رجوع</button>
+  <button class="btn-next" id="btn-next" onclick="goNext()">التالي ←</button>
+</div>
+
+<script>
+// ════════════════════════════════════
+// SUPABASE CONFIG
+// ════════════════════════════════════
+const SUPA_URL = 'https://cclojwnopipepdfwhbcd.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbG9qd25vcGlwZXBkZndoYmNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4MDA0MjgsImV4cCI6MjA5NTM3NjQyOH0.4IvRTpMyy07FVZXSlI1BHkn-Be5a2L4bQxxpVcH1JFQ';
+
+const supa = {
+  async insert(table, data) {
+    const r = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(data)
+    });
+    return r.ok;
+  },
+  async get(table, id) {
+    const r = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d[0] || null;
+  }
+};
+
+// ════════════════════════════════════
+// STATE
+// ════════════════════════════════════
+let mode = 'home', pStep = 0, dStep = 0;
+const P = { name:'', age:'', gender:'', dur:'', pain:'', dist:'', rf:new Array(5).fill(null), start:new Array(9).fill(null), id:null };
+const D = { dir:null, resp:null, syndrome:null, mech:null, xray:new Set(), xrayAvail:null };
+
+// ════════════════════════════════════
+// DATA
+// ════════════════════════════════════
+const rfData = [
+  'هل تشعر بألم ليلي يوقظك من النوم أو لا يهدأ في الراحة؟',
+  'هل فقدت وزناً بشكل غير مبرر مؤخراً أو تعاني من حمى؟',
+  'هل لاحظت ضعفاً أو تنميلاً متزايداً في ساقيك؟',
+  'هل سبق وتشخصت بمرض سرطان؟',
+  'هل تعرضت لحادث أو سقوط شديد مؤخراً؟',
+];
+
+// Official Arabic STarT Back (Eilayyan et al. 2025 / Keele University)
+const startData = [
+  { ar:'انتقل ألم ظهري إلى إحدى أو كلتا رجلي في بعض الأوقات خلال الأسبوعين الماضيين' },
+  { ar:'شعرت بألم في كتفي أو رقبتي في وقت ما خلال الأسبوعين الماضيين' },
+  { ar:'استطعت المشي فقط لمسافات قصيرة بسبب ألم ظهري' },
+  { ar:'ارتديت ملابسي أبطأ من المعتاد بسبب ألم ظهري خلال الأسبوعين الماضيين' },
+  { ar:'من الخطر لشخص يعاني مما أعاني منه أن يكون نشيطاً جسدياً' },
+  { ar:'تدور في ذهني أفكار مقلقة في كثير من الأوقات' },
+  { ar:'أشعر بأن ألم ظهري فظيع ولن يتحسن أبداً' },
+  { ar:'بشكل عام، لم أعد أستمتع بما كنت أستمتع به في السابق' },
+  { ar:'إجمالاً، ما مدى انزعاجك من ألم ظهرك خلال الأسبوعين الماضيين؟', special:true },
+];
+
+const dirData = [
+  { id:'ext', title:'Extension Preference', desc:'Backward bending centralises symptoms', ref:'Long et al. Spine (2004)' },
+  { id:'flex', title:'Flexion Preference', desc:'Forward bending centralises symptoms', ref:'McKenzie & May (2003)' },
+  { id:'lat', title:'Lateral / Rotational', desc:'Side-glide centralises symptoms', ref:'McKenzie & May (2003)' },
+  { id:'none', title:'No Directional Preference', desc:'No direction consistently improves symptoms', ref:'Hefford (2008)' },
+];
+const respData = [
+  { id:'central', c:'s-t', title:'✅ Centralisation', desc:'Distal symptoms moving proximally', ref:'Werneke et al. (1999) κ=0.84' },
+  { id:'periph',  c:'s-r', title:'⚠ Peripheralisation', desc:'Symptoms spreading distally — stop this direction', ref:'Werneke & Hart (2001)' },
+  { id:'nc',      c:'s-b', title:'No Change', desc:'No meaningful symptom change', ref:'Hefford (2008)' },
+];
+const synData = [
+  { id:'derangement', c:'s-t', title:'Derangement Syndrome', desc:'Clear DP + Centralisation. Goal: Reduction → Recovery', ref:'Hefford (2008) κ=0.60' },
+  { id:'dysfunction',  c:'s-b', title:'Dysfunction Syndrome', desc:'End-range pain only. No DP. Gradual stretch.', ref:'McKenzie & May (2003)' },
+  { id:'postural',     c:'s-b', title:'Postural Syndrome', desc:'Pain from sustained posture only.', ref:'McKenzie & May (2003)' },
+  { id:'other',        c:'s-a', title:'Other / Non-Mechanical', desc:'Stenosis / SIJ / Inflammatory — consider referral', ref:'Foster et al. (2013)' },
+];
+const mechData = [
+  { id:'mdt',   c:'s-t', title:'Mechanical / MDT', desc:'Responds to directional exercise.', ref:'Foster et al. (2013)' },
+  { id:'patho', c:'s-b', title:'Pathoanatomical', desc:'Identifiable anatomical source.', ref:'Foster et al. (2013)' },
+  { id:'cft',   c:'s-a', title:'Psychosocial / CFT', desc:'Fear-avoidance dominant. NOT for red flags.', ref:"O'Sullivan et al. (2018)" },
+  { id:'tbc',   c:'s-b', title:'Treatment-Based (TBC)', desc:'Manipulation / Stabilisation / Traction.', ref:'Fritz et al. (2003)' },
+];
+const xrayData = [
+  { id:'disc',    title:'Disc Space Narrowing', ref:'Brinjikji et al. (2015)', urgent:false },
+  { id:'osteo',   title:'Osteophytes', ref:'Boden et al. (1990)', urgent:false },
+  { id:'spondyl', title:'Spondylolisthesis', ref:'Jacobsen et al. (2007)', urgent:false },
+  { id:'scolio',  title:'Scoliosis', ref:'Cobb (1948)', urgent:false },
+  { id:'fracture',title:'Vertebral Fracture 🚩', ref:'NICE NG59 (2020)', urgent:true },
+  { id:'normal',  title:'Normal', ref:'NICE NG59 (2020)', urgent:false },
+];
+
+// ════════════════════════════════════
+// PATIENT FLOW
+// ════════════════════════════════════
+function startPatient() {
+  mode='patient'; pStep=1;
+  document.getElementById('mode-badge').className='mode-badge mode-p';
+  document.getElementById('mode-badge').textContent='PATIENT';
+  document.getElementById('hdr-tag').textContent='استبيان المريض';
+  document.getElementById('bot-bar').style.display='flex';
+  showScreen('sc-p1'); renderProgP(); renderRF(); renderStart(); updateBot();
+}
+
+function renderProgP() {
+  document.getElementById('prog-bar').style.display='block';
+  const lbls=['البيانات','الأسئلة','الاستبيان','رقمك'];
+  let h='';
+  for(let i=1;i<=4;i++){
+    const done=i<pStep,active=i===pStep;
+    h+=`<div class="pd"><div class="pd-dot ${done?'done':active?'active':''}">${done?'✓':i}</div><div class="pd-lbl ${active?'active':''}">${lbls[i-1]}</div></div>`;
+    if(i<4)h+=`<div class="pd-con ${i<pStep?'done':''}"></div>`;
+  }
+  document.getElementById('prog-row').innerHTML=h;
+}
+
+function renderRF() {
+  document.getElementById('rf-box').innerHTML=rfData.map((r,i)=>`
+    <div class="q-item ${P.rf[i]!==null?'answered':''}">
+      <div class="q-num">سؤال ${i+1}</div>
+      <div class="q-text">${r}</div>
+      <div class="q-opts">
+        <button class="q-btn ${P.rf[i]==1?'sel-y':''}" onclick="ansRF(${i},1)">نعم</button>
+        <button class="q-btn ${P.rf[i]==0?'sel-n':''}" onclick="ansRF(${i},0)">لا</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderStart() {
+  document.getElementById('start-box').innerHTML=startData.map((q,i)=>`
+    <div class="q-item ${P.start[i]!==null?'answered':''}">
+      <div class="q-num">سؤال ${i+1}</div>
+      <div class="q-text">${q.ar}</div>
+      <div class="q-opts">
+      ${q.special
+        ?`<button class="q-btn ${P.start[i]==='low'?'sel-n':''}" onclick="ansStart(${i},'low')">أبداً</button>
+          <button class="q-btn ${P.start[i]==='little'?'sel-n':''}" onclick="ansStart(${i},'little')">قليلاً</button>
+          <button class="q-btn ${P.start[i]==='mod'?'sel-o':''}" onclick="ansStart(${i},'mod')">متوسط</button>
+          <button class="q-btn ${P.start[i]==='very'?'sel-y':''}" onclick="ansStart(${i},'very')">كثيراً</button>
+          <button class="q-btn ${P.start[i]==='ext'?'sel-y':''}" onclick="ansStart(${i},'ext')">جداً</button>`
+        :`<button class="q-btn ${P.start[i]==1?'sel-y':''}" onclick="ansStart(${i},1)">موافق</button>
+          <button class="q-btn ${P.start[i]==0?'sel-n':''}" onclick="ansStart(${i},0)">غير موافق</button>`
+      }
+      </div>
+    </div>`).join('');
+}
+
+function ansRF(i,v) { P.rf[i]=parseInt(v); renderRF(); }
+function ansStart(i,v) { P.start[i]=(v==='0'||v==='1')?parseInt(v):v; renderStart(); }
+
+function calcStart() {
+  let t=0,s=0;
+  P.start.forEach((a,i)=>{
+    if(i===8){if(a==='mod'||a==='very'||a==='ext'){t++;s++;}}
+    else if(a==1){t++;if(i>=4)s++;}
+  });
+  return {total:t,sub:s};
+}
+
+function genID() { return String(Math.floor(1000+Math.random()*9000)); }
+
+async function finishPatient() {
+  showScreen('sc-loading');
+  document.getElementById('loading-msg').textContent='جاري الحفظ...';
+  document.getElementById('bot-bar').style.display='none';
+
+  const {total,sub}=calcStart();
+  const risk=total<=3?'Low Risk':sub<=3?'Medium Risk':'High Risk';
+  const id=genID();
+  P.id=id;
+
+  const ok=await supa.insert('sessions',{
+    id, patient_name:P.name, patient_age:P.age,
+    patient_gender:P.gender, patient_duration:P.dur,
+    patient_pain:P.pain, patient_distribution:P.dist,
+    red_flags:P.rf, start_answers:P.start,
+    start_total:total, start_sub:sub, start_risk:risk
+  });
+
+  if(ok) {
+    document.getElementById('pt-id-display').textContent=id;
+    pStep=4; showScreen('sc-p4');
+    document.getElementById('prog-bar').style.display='none';
+  } else {
+    alert('خطأ في الحفظ — تأكد من الاتصال بالإنترنت');
+    pStep=3; showScreen('sc-p3');
+    document.getElementById('bot-bar').style.display='flex';
+    renderProgP(); updateBot();
+  }
+}
+
+// ════════════════════════════════════
+// DOCTOR FLOW
+// ════════════════════════════════════
+function startDoctor() {
+  mode='doctor'; dStep=0;
+  document.getElementById('mode-badge').className='mode-badge mode-d';
+  document.getElementById('mode-badge').textContent='DOCTOR';
+  document.getElementById('hdr-tag').textContent='Doctor Portal';
+  document.getElementById('prog-bar').style.display='none';
+  document.getElementById('bot-bar').style.display='flex';
+  showScreen('sc-d0'); updateBot();
+}
+
+async function loadPatient() {
+  const id=document.getElementById('doc-id-input').value.trim();
+  if(!id||id.length!==4){document.getElementById('id-error').style.display='flex';return;}
+  document.getElementById('id-error').style.display='none';
+
+  showScreen('sc-loading');
+  document.getElementById('loading-msg').textContent='Loading patient data...';
+
+  const sess=await supa.get('sessions',id);
+  if(!sess){
+    showScreen('sc-d0');
+    document.getElementById('id-error').style.display='flex';
+    return;
+  }
+
+  // Load patient data
+  P.name=sess.patient_name; P.age=sess.patient_age;
+  P.gender=sess.patient_gender; P.dur=sess.patient_duration;
+  P.pain=sess.patient_pain; P.dist=sess.patient_distribution;
+  P.rf=sess.red_flags; P.start=sess.start_answers;
+  P.id=id;
+
+  dStep=1;
+  document.getElementById('prog-bar').style.display='block';
+  showScreen('sc-d1');
+  renderProgD(); renderPtSum('pt-sum-d1'); renderDir(); renderResp(); renderSyn(); renderMech(); renderXray();
+  updateBot();
+}
+
+function renderProgD() {
+  const lbls=['McKenzie','Syndrome\n& Mech','X-Ray','Result'];
+  let h='';
+  for(let i=1;i<=4;i++){
+    const done=i<dStep,active=i===dStep;
+    h+=`<div class="pd"><div class="pd-dot ${done?'d-done':active?'d-active':''}">${done?'✓':i}</div><div class="pd-lbl ${active?'d-active':''}">${lbls[i-1]}</div></div>`;
+    if(i<4)h+=`<div class="pd-con ${i<dStep?'d-done':''}"></div>`;
+  }
+  document.getElementById('prog-row').innerHTML=h;
+}
+
+function renderPtSum(id) {
+  const {total,sub}=calcStart();
+  const risk=total<=3?'low':sub<=3?'med':'high';
+  const rc={low:'var(--green)',med:'var(--amber)',high:'var(--red)'}[risk];
+  const rb={low:'var(--gd)',med:'var(--ad)',high:'var(--rd)'}[risk];
+  const rl={low:'LOW RISK',med:'MEDIUM RISK',high:'HIGH RISK'}[risk];
+  const hasRF=P.rf&&P.rf.some(a=>a==1);
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML=`
+    <div class="pt-sum">
+      <div class="pt-sum-head">📋 Patient — ID: ${P.id}</div>
+      <div class="pt-sum-grid">
+        <div class="pt-sum-item"><div class="pt-sum-lbl">Name</div><div class="pt-sum-val">${P.name}</div></div>
+        <div class="pt-sum-item"><div class="pt-sum-lbl">Age / Gender</div><div class="pt-sum-val">${P.age} yrs · ${P.gender}</div></div>
+        <div class="pt-sum-item"><div class="pt-sum-lbl">Duration</div><div class="pt-sum-val">${P.dur}</div></div>
+        <div class="pt-sum-item"><div class="pt-sum-lbl">NRS Pain</div><div class="pt-sum-val">${P.pain}/10</div></div>
+      </div>
+      ${hasRF?'<div class="alert a-r" style="margin-top:9px"><span>🚩</span><strong>Red Flag Present — Medical referral required</strong></div>':''}
+      <div class="start-result">
+        <div><div class="start-score" style="color:${rc}">${total}/9</div><div style="font-size:0.56rem;color:var(--muted);font-family:monospace">Sub:${sub}</div></div>
+        <div><div class="start-risk-lbl" style="color:${rc}">${rl}</div><div class="start-desc">STarT Back · Hill et al. (2008)</div></div>
+      </div>
+    </div>`;
+}
+
+function renderDir() {
+  document.getElementById('dir-box').innerHTML=dirData.map(d=>`
+    <div class="sel ${D.dir===d.id?'s-t':''}" onclick="D.dir='${d.id}';renderDir()">
+      <div class="sel-radio"></div>
+      <div class="sel-body"><div class="sel-title">${d.title}</div><div class="sel-desc">${d.desc}</div><div class="sel-ref">📚 ${d.ref}</div></div>
+    </div>`).join('');
+}
+function renderResp() {
+  document.getElementById('resp-box').innerHTML=respData.map(r=>`
+    <div class="sel ${D.resp===r.id?r.c:''}" onclick="D.resp='${r.id}';renderResp()">
+      <div class="sel-radio"></div>
+      <div class="sel-body"><div class="sel-title">${r.title}</div><div class="sel-desc">${r.desc}</div><div class="sel-ref">📚 ${r.ref}</div></div>
+    </div>`).join('');
+}
+function renderSyn() {
+  document.getElementById('syn-box').innerHTML=synData.map(s=>`
+    <div class="sel ${D.syndrome===s.id?s.c:''}" onclick="D.syndrome='${s.id}';renderSyn()">
+      <div class="sel-radio"></div>
+      <div class="sel-body"><div class="sel-title">${s.title}</div><div class="sel-desc">${s.desc}</div><div class="sel-ref">📚 ${s.ref}</div></div>
+    </div>`).join('');
+}
+function renderMech() {
+  document.getElementById('mech-box').innerHTML=mechData.map(m=>`
+    <div class="sel ${D.mech===m.id?m.c:''}" onclick="D.mech='${m.id}';renderMech()">
+      <div class="sel-radio"></div>
+      <div class="sel-body"><div class="sel-title">${m.title}</div><div class="sel-desc">${m.desc}</div><div class="sel-ref">📚 ${m.ref}</div></div>
+    </div>`).join('');
+}
+
+function selXYN(v) {
+  D.xrayAvail=v;
+  document.getElementById('xyn-yes').className='sel'+(v==='yes'?' s-t':'');
+  document.getElementById('xyn-no').className='sel'+(v==='no'?' s-b':'');
+  document.getElementById('xray-findings').style.display=v==='yes'?'block':'none';
+}
+
+function renderXray() {
+  document.getElementById('xray-box').innerHTML=xrayData.map(x=>{
+    const sel=D.xray.has(x.id);
+    const bc=sel?(x.urgent?'var(--red)':'var(--teal)'):'var(--bord)';
+    const bg=sel?(x.urgent?'var(--rd)':'var(--td)'):'var(--deep)';
+    return `<div style="border:1.5px solid ${bc};background:${bg};border-radius:9px;padding:10px 12px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;gap:9px" onclick="toggleX('${x.id}')">
+      <div style="width:17px;height:17px;border-radius:4px;border:1.5px solid ${bc};background:${sel?bc:'transparent'};display:flex;align-items:center;justify-content:center;font-size:0.58rem;color:var(--void);font-weight:900;flex-shrink:0">${sel?'✓':''}</div>
+      <div><div style="font-size:0.82rem;font-weight:700;color:${sel?(x.urgent?'var(--red)':'var(--teal)'):'var(--bright)'}">${x.title}</div>
+      <div style="font-family:monospace;font-size:0.54rem;color:var(--muted)">📚 ${x.ref}</div></div>
+    </div>`;
+  }).join('');
+}
+function toggleX(id){D.xray.has(id)?D.xray.delete(id):D.xray.add(id);renderXray();}
+
+// ════════════════════════════════════
+// RESULT ENGINE
+// ════════════════════════════════════
+function buildResult() {
+  const {total,sub}=calcStart();
+  const risk=total<=3?'low':sub<=3?'med':'high';
+  const rc={low:'var(--green)',med:'var(--amber)',high:'var(--red)'}[risk];
+  const hasRF=P.rf&&P.rf.some(a=>a==1);
+  const hasFracture=D.xray.has('fracture');
+
+  let proto='',protoName='',sessions='',planItems=[],protoColor='var(--teal)';
+
+  if(hasFracture||hasRF){
+    proto='REF'; protoName='Immediate Medical Referral'; sessions='Do not start PT'; protoColor='var(--red)';
+    planItems=[{ico:'🚨',lbl:'Urgent Referral',txt:'Red flag or fracture present. Medical evaluation required before physiotherapy.'}];
+  } else if(risk==='low'){
+    if(D.dir&&D.dir!=='none'){
+      proto='P1a'; protoName='Self-Management + Directed Exercise'; sessions='1–3 sessions'; protoColor='var(--green)';
+      planItems=[
+        {ico:'📚',lbl:'Education',txt:'NSLBP is not dangerous. Activity is safe.'},
+        {ico:'🏃',lbl:'Home Exercises',txt:`McKenzie ${D.dir} exercises — 10 reps every 2 hours.`},
+        {ico:'🔁',lbl:'Reassess at 2 Weeks',txt:'No improvement → escalate to P2.'},
+      ];
+    } else {
+      proto='P1b'; protoName='Self-Management + Education Only'; sessions='1–2 sessions'; protoColor='var(--green)';
+      planItems=[
+        {ico:'📚',lbl:'Education & Reassurance',txt:'Posture advice. Stay active. No specific exercise direction identified.'},
+        {ico:'🔁',lbl:'Reassess at 2 Weeks',txt:'No improvement → McKenzie re-assessment.'},
+      ];
+    }
+  } else if(risk==='med'){
+    if(D.resp==='central'){
+      proto='P2a'; protoName='Active PT — McKenzie Led'; sessions='4–6 sessions'; protoColor='var(--blue)';
+      planItems=[
+        {ico:'🔄',lbl:'McKenzie Directed',txt:`${D.dir} programme. Progress loading each session.`},
+        {ico:'💪',lbl:'Core Stabilisation',txt:'Bird-Dog, Dead Bug, Plank as tolerated.'},
+        {ico:'🔁',lbl:'Reassess at 4 Weeks',txt:'Repeat STarT Back. Adjust if needed.'},
+      ];
+    } else if(D.resp==='periph'){
+      proto='P2b'; protoName='Active PT + Psychosocial'; sessions='6–8 sessions'; protoColor='var(--amber)';
+      planItems=[
+        {ico:'⚠',lbl:'Change Direction',txt:'Peripheralisation detected — reverse or change direction immediately.'},
+        {ico:'🤝',lbl:'Manual Therapy',txt:'Mobilisation + stabilisation exercises.'},
+        {ico:'🗣',lbl:'Fear-Avoidance',txt:'Address catastrophising with graded exposure.'},
+      ];
+    } else {
+      proto='P3'; protoName='Combined Approach'; sessions='6–8 sessions'; protoColor='var(--amber)';
+      planItems=[
+        {ico:'💪',lbl:'Stabilisation',txt:'Core stability exercises. Pacing strategies.'},
+        {ico:'🗣',lbl:'Psychosocial Support',txt:'Pain neuroscience education. Address barriers.'},
+        {ico:'🔁',lbl:'Reassess at 4 Weeks',txt:'Repeat STarT Back.'},
+      ];
+    }
+  } else {
+    proto='P4'; protoName='Cognitive Functional Therapy'; sessions='8–12+ sessions'; protoColor='var(--purple)';
+    planItems=[
+      {ico:'🧠',lbl:'Pain Neuroscience Education',txt:'Pain ≠ damage. Central sensitisation explained.'},
+      {ico:'🔍',lbl:'Movement Retraining',txt:'Graded exposure to feared movements.'},
+      {ico:'🌱',lbl:'Lifestyle',txt:'Progressive return to all activities.'},
+      {ico:'👥',lbl:'MDT Collaboration',txt:'Coordinate with psychologist if indicated.'},
+    ];
+  }
+
+  const riskLabel={low:'LOW',med:'MEDIUM',high:'HIGH'}[risk];
+  const dirLbl={ext:'Extension',flex:'Flexion',lat:'Lateral',none:'None'}[D.dir]||'—';
+  const respLbl={central:'✅ Centralisation',periph:'⚠ Peripheralisation',nc:'No Change'}[D.resp]||'—';
+  const xrayTxt=[...D.xray].map(id=>xrayData.find(x=>x.id===id)?.title||'?').join(', ')||'Not performed';
+
+  document.getElementById('result-box').innerHTML=`
+    ${hasRF?'<div class="alert a-r">🚩 <div><strong>Red Flag Present!</strong> Medical referral required.</div></div>':''}
+    ${D.resp==='periph'?'<div class="alert a-r">⚠ <div><strong>Peripheralisation detected.</strong> Change direction immediately.</div></div>':''}
+    ${hasFracture?'<div class="alert a-r">🦴 <div><strong>Vertebral fracture on X-ray</strong> — immediate referral.</div></div>':''}
+
+    <div class="res-hero">
+      <div class="res-pt">Patient: ${P.name} · ID: ${P.id} · ${P.age}yrs · NRS: ${P.pain}/10</div>
+      <div class="res-lbl">ALGORITHM OUTPUT</div>
+      <div class="res-num" style="color:${protoColor}">${proto}</div>
+      <div class="res-name">${protoName}</div>
+      <div class="res-sessions">${sessions} recommended</div>
+    </div>
+
+    <div class="res-chips">
+      <div class="r-chip" style="border-color:${rc}">
+        <div class="r-chip-lbl">STarT Back</div>
+        <div class="r-chip-val" style="color:${rc}">${riskLabel} ${total}/9</div>
+      </div>
+      <div class="r-chip" style="border-color:var(--teal)">
+        <div class="r-chip-lbl">McKenzie</div>
+        <div class="r-chip-val" style="color:var(--teal);font-size:0.68rem">${dirLbl}</div>
+      </div>
+      <div class="r-chip" style="border-color:var(--purple)">
+        <div class="r-chip-lbl">Response</div>
+        <div class="r-chip-val" style="color:var(--purple);font-size:0.65rem">${respLbl}</div>
+      </div>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-head">📋 ${proto}: ${protoName}</div>
+      ${planItems.map(p=>`<div class="plan-item"><div class="plan-ico">${p.ico}</div><div class="plan-text"><span class="plan-lbl">${p.lbl}</span>${p.txt}</div></div>`).join('')}
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-head">📊 Complete Assessment</div>
+      <div class="plan-item"><div class="plan-ico">👤</div><div class="plan-text"><span class="plan-lbl">Patient</span>${P.name} · ${P.age}yrs · ${P.gender}</div></div>
+      <div class="plan-item"><div class="plan-ico">📊</div><div class="plan-text"><span class="plan-lbl">STarT Back</span>Total:${total}/9 · Sub:${sub}/5 · <strong style="color:${rc}">${riskLabel}</strong></div></div>
+      <div class="plan-item"><div class="plan-ico">🔄</div><div class="plan-text"><span class="plan-lbl">McKenzie</span>DP: ${dirLbl} · Response: ${respLbl}</div></div>
+      <div class="plan-item"><div class="plan-ico">🩻</div><div class="plan-text"><span class="plan-lbl">X-Ray</span>${xrayTxt}</div></div>
+      <div class="plan-item"><div class="plan-ico">🚩</div><div class="plan-text"><span class="plan-lbl">Red Flags</span>${hasRF?'⚠️ Present':'✅ None'}</div></div>
+    </div>
+
+    <div style="text-align:center;padding:10px;background:var(--surf);border:1px solid var(--bord);border-radius:9px">
+      <div style="font-family:monospace;font-size:0.56rem;color:var(--muted);letter-spacing:1px">ALGORITHM OUTPUT · FOR EXPERT COMPARISON (κ AGREEMENT)</div>
+    </div>`;
+}
+
+// ════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════
+async function goNext() {
+  if(mode==='patient'){
+    if(pStep===1){
+      if(!document.getElementById('p-name').value){alert('أدخل اسمك');return;}
+      P.name=document.getElementById('p-name').value;
+      P.age=document.getElementById('p-age').value;
+      P.gender=document.getElementById('p-gender').value;
+      P.dur=document.getElementById('p-dur').value;
+      P.pain=document.getElementById('p-pain').value;
+      P.dist=document.getElementById('p-dist').value;
+      pStep=2; showScreen('sc-p2'); renderProgP();
+    } else if(pStep===2){
+      if(P.rf.some(a=>a===null)){alert('أجب على جميع الأسئلة');return;}
+      pStep=3; showScreen('sc-p3'); renderProgP();
+    } else if(pStep===3){
+      if(P.start.some(a=>a===null)){alert('أجب على جميع الأسئلة');return;}
+      await finishPatient(); return;
+    }
+  } else if(mode==='doctor'){
+    if(dStep===1){
+      if(!D.dir||!D.resp){alert('Select Direction AND Response');return;}
+      dStep=2; showScreen('sc-d2'); renderProgD();
+    } else if(dStep===2){
+      if(!D.syndrome||!D.mech){alert('Select syndrome AND mechanism');return;}
+      dStep=3; showScreen('sc-d3'); renderProgD();
+    } else if(dStep===3){
+      if(!D.xrayAvail){alert('Select X-ray availability');return;}
+      dStep=4; buildResult(); showScreen('sc-d4'); renderProgD();
+      document.getElementById('bot-bar').innerHTML=`
+        <button class="btn-new" onclick="location.reload()">🏠 Home</button>
+        <button class="btn-new" onclick="window.print()" style="border-color:var(--blue);color:var(--blue)">🖨 Print</button>`;
+      return;
+    }
+  }
+  updateBot();
+}
+
+function goBack() {
+  if(mode==='patient'){
+    if(pStep>1){pStep--;showScreen('sc-p'+pStep);renderProgP();}
+    else{goHome();}
+  } else if(mode==='doctor'){
+    if(dStep>1){dStep--;showScreen('sc-d'+dStep);renderProgD();}
+    else{dStep=0;showScreen('sc-d0');document.getElementById('prog-bar').style.display='none';}
+  }
+  updateBot();
+}
+
+function goHome(){
+  mode='home';pStep=0;dStep=0;
+  document.getElementById('prog-bar').style.display='none';
+  document.getElementById('bot-bar').style.display='none';
+  showScreen('sc-home');
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+function updateBot(){
+  const bb=document.getElementById('btn-back');
+  const bn=document.getElementById('btn-next');
+  if(!bb||!bn)return;
+  bb.style.display='block';
+  if(mode==='patient'){
+    bn.className='btn-next';
+    bn.textContent=pStep===3?'إنهاء وأخذ الرقم ✓':'التالي ←';
+    bb.textContent=pStep===1?'← الرئيسية':'← رجوع';
+  } else if(mode==='doctor'){
+    bn.className='btn-doc';
+    bn.textContent=dStep===3?'Generate Result →':'Next →';
+    bb.textContent='← Back';
+  }
+}
+
+document.getElementById('bot-bar').style.display='none';
+</script>
+</body>
+</html>
