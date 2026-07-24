@@ -28,6 +28,33 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
 .mode-badge{font-family:'DM Mono',monospace;font-size:0.58rem;padding:3px 10px;border-radius:20px;letter-spacing:1px;}
 .mode-p{background:var(--td);color:var(--teal);border:1px solid rgba(0,212,168,0.25);}
 .mode-d{background:var(--bd);color:var(--blue);border:1px solid rgba(61,142,245,0.25);}
+.mode-e{background:var(--pd);color:var(--purple);border:1px solid rgba(155,111,232,0.3);}
+.hbtn-e{background:var(--pd);border-color:var(--purple);}
+.hbtn-e .hbtn-title{color:var(--purple);}
+.s-eye.exp{color:var(--purple);}
+.btn-exp{flex:1;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--purple),#C084FC);color:var(--void);font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:800;cursor:pointer;}
+.pd-dot.e-active{background:var(--pd);border-color:var(--purple);color:var(--purple);}
+.pd-dot.e-done{background:var(--purple);border-color:var(--purple);color:var(--void);}
+.pd-lbl.e-active{color:var(--purple);}
+.pd-con.e-done{background:var(--purple);}
+.blind-banner{background:linear-gradient(135deg,var(--pd),var(--rd));border:1.5px solid var(--purple);border-radius:11px;padding:12px 14px;margin-bottom:13px;}
+.blind-title{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:1.5px;color:var(--purple);font-weight:700;margin-bottom:5px;}
+.blind-text{font-size:0.73rem;color:var(--text);line-height:1.6;}
+.rater-pick{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px;}
+.rater-btn{padding:13px 10px;border-radius:11px;border:2px solid var(--bord);background:var(--deep);text-align:center;cursor:pointer;transition:all 0.18s;}
+.rater-btn.sel{border-color:var(--purple);background:var(--pd);}
+.rater-btn-t{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--muted);}
+.rater-btn.sel .rater-btn-t{color:var(--purple);}
+.rater-btn-s{font-size:0.65rem;color:var(--dim);margin-top:2px;}
+.sec-num{display:inline-block;width:20px;height:20px;border-radius:5px;background:var(--purple);color:var(--void);font-family:'DM Mono',monospace;font-size:0.62rem;font-weight:800;text-align:center;line-height:20px;margin-left:7px;}
+.saved-box{background:linear-gradient(135deg,var(--pd),var(--deep));border:2px solid var(--purple);border-radius:16px;padding:26px;text-align:center;}
+.saved-icon{font-size:2.6rem;margin-bottom:10px;}
+.saved-t{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--purple);margin-bottom:5px;}
+.saved-s{font-size:0.78rem;color:var(--dim);line-height:1.6;}
+.sum-line{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bord);font-size:0.76rem;}
+.sum-line:last-child{border-bottom:none;}
+.sum-k{color:var(--dim);}
+.sum-v{color:var(--bright);font-weight:700;}
 
 .main{max-width:620px;margin:0 auto;padding:24px 14px 90px;position:relative;z-index:1;}
 .screen{display:none;animation:fu 0.22s ease;}
@@ -211,8 +238,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
   <div class="home-hero">
     <span class="home-icon">🏥</span>
     <div class="home-title">SpineAI</div>
-    <div class="home-sub">نظام تقييم ألم أسفل الظهر — بوابة للمريض وبوابة للمعالج</div>
-    <div class="home-btns">
+    <div class="home-sub">نظام تصنيف ألم أسفل الظهر — ثلاث بوابات: المريض · المعالج · الخبير</div>
+    <div class="home-btns" style="grid-template-columns:1fr 1fr;">
       <div class="hbtn hbtn-p" onclick="startPatient()">
         <span class="hbtn-icon">🧑‍⚕️</span>
         <div class="hbtn-title">أنا مريض</div>
@@ -224,6 +251,44 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
         <div class="hbtn-sub">أدخل رقم المريض وأكمل التقييم</div>
       </div>
     </div>
+    <div class="home-btns" style="grid-template-columns:1fr;margin-top:12px;max-width:400px;">
+      <div class="hbtn hbtn-e" onclick="startExpert()">
+        <span class="hbtn-icon">🔬</span>
+        <div class="hbtn-title">Expert Rater</div>
+        <div class="hbtn-sub">Blinded independent assessment — Research use</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bord);max-width:400px;margin-left:auto;margin-right:auto;">
+      <div style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;">RESEARCH · TEST-RETEST</div>
+      <div class="hbtn" style="background:var(--surf);border-color:var(--bord);padding:13px;" onclick="startRetest()">
+        <span style="font-size:1.2rem;">🔁</span>
+        <div style="font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:800;color:var(--dim);margin-top:3px;">إعادة التقييم / Retest</div>
+        <div class="hbtn-sub">للمريض الذي يعيد التقييم بعد 3–7 أيام</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- R0: Retest Entry -->
+<div class="screen" id="sc-r0">
+  <div class="s-eye pat">إعادة التقييم · Test-Retest</div>
+  <div class="s-title">إعادة التقييم</div>
+  <div class="s-sub">أدخل رقم الجلسة الأصلي من الزيارة الأولى.</div>
+
+  <div class="card">
+    <div class="card-lbl">رقم الجلسة الأصلي</div>
+    <div class="id-entry">
+      <div class="id-entry-sub">الرقم الذي حصلت عليه في المرة الأولى</div>
+      <input type="text" class="id-input" id="retest-id-input" placeholder="0000" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    </div>
+    <div id="retest-error" style="display:none" class="alert a-r"><span>❌</span><span id="retest-err-msg">لم يتم العثور على الرقم</span></div>
+    <div id="retest-found" style="display:none" class="alert a-t"><span>✅</span><span id="retest-found-msg"></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Global Rating of Change — مقياس التغير</div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">مقارنةً بالمرة الأولى — كيف حالة ظهرك الآن؟ (Koo &amp; Li, 2016)</span></div>
+    <div id="grc-box"></div>
   </div>
 </div>
 
@@ -370,6 +435,153 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear
   </div>
 </div>
 
+<!-- ═══════ EXPERT PORTAL ═══════ -->
+
+<!-- E0: Rater ID + Session ID -->
+<div class="screen" id="sc-e0">
+  <div class="s-eye exp">Expert Portal · Blinded Assessment</div>
+  <div class="s-title">Expert Rater Login</div>
+  <div class="s-sub">Independent blinded assessment for the SpineAI validation study.</div>
+
+  <div class="blind-banner">
+    <div class="blind-title">⚠ BLINDING PROTOCOL</div>
+    <div class="blind-text">You will NOT see the application output or any co-rater assessment. Complete your evaluation based solely on your own independent clinical examination.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Rater Identification</div>
+    <div class="rater-pick">
+      <div class="rater-btn" id="rb-E1" onclick="pickRater('E1')">
+        <div class="rater-btn-t">E1</div>
+        <div class="rater-btn-s">Expert Rater 1</div>
+      </div>
+      <div class="rater-btn" id="rb-E2" onclick="pickRater('E2')">
+        <div class="rater-btn-t">E2</div>
+        <div class="rater-btn-s">Expert Rater 2</div>
+      </div>
+    </div>
+    <div class="field"><label>Rater Full Name</label><input type="text" id="e-name" placeholder="Your name"></div>
+    <div class="field-row">
+      <div class="field"><label>Years NSLBP Experience</label><input type="number" id="e-years" placeholder="e.g. 8" min="5"></div>
+      <div class="field"><label>McKenzie Qualification</label>
+        <select id="e-qual">
+          <option value="">--</option>
+          <option value="Diploma">Diploma</option>
+          <option value="Credential">Credential</option>
+          <option value="Part C">Part C</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Patient Session ID</div>
+    <div class="id-entry">
+      <div class="id-entry-sub">Enter the 4-digit code from the patient record</div>
+      <input type="text" class="id-input" id="exp-id-input" placeholder="0000" maxlength="4" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+      <br>
+      <button class="id-load-btn" style="background:linear-gradient(135deg,var(--purple),#C084FC)" onclick="loadForExpert()">Load Patient →</button>
+    </div>
+    <div id="exp-id-error" style="display:none" class="alert a-r"><span>❌</span><span id="exp-err-msg">ID not found.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Declaration of Independence</div>
+    <div class="sel" id="decl-box" onclick="toggleDecl()">
+      <div class="sel-radio"></div>
+      <div class="sel-body">
+        <div class="sel-title">I confirm independence</div>
+        <div class="sel-desc">I will complete this assessment independently, without reference to the application output or any co-rater's evaluation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- E1: Patient Data (blinded) + STarT Back -->
+<div class="screen" id="sc-e1">
+  <div class="s-eye exp">Section 1 of 4 · Patient Data & Risk</div>
+  <div class="s-title">Patient Information</div>
+  <div class="s-sub">Review the patient-reported data below, then record your independent risk classification.</div>
+  <div id="exp-pt-sum"></div>
+  <div class="card">
+    <div class="card-lbl">Your Risk Classification<span class="sec-num">1</span></div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">STarT Back scoring: Low = total 0–3 · Medium = total ≥4 with subscale ≤3 · High = total ≥4 with subscale ≥4 (Hill et al., 2008)</span></div>
+    <div id="exp-risk-box"></div>
+  </div>
+</div>
+
+<!-- E2: McKenzie -->
+<div class="screen" id="sc-e2">
+  <div class="s-eye exp">Section 2 of 4 · McKenzie MDT</div>
+  <div class="s-title">Your Mechanical Assessment</div>
+  <div class="s-sub">Perform your own repeated end-range movement examination.</div>
+  <div class="card">
+    <div class="card-lbl">Directional Preference<span class="sec-num">2</span></div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">Kilpikoski et al. (2002) κ = 0.69 — Ask the patient to perform 10 repeated end-range movements in each direction.</span></div>
+    <div id="exp-dir-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-lbl">Symptom Response<span class="sec-num">3</span></div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">Werneke et al. (1999) κ = 0.84 — Centralisation: distal symptoms move proximally. Peripheralisation: symptoms spread distally.</span></div>
+    <div id="exp-resp-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-lbl">Overall Interpretation<span class="sec-num">4</span></div>
+    <div id="exp-overall-box"></div>
+  </div>
+</div>
+
+<!-- E3: Syndrome + Mechanism -->
+<div class="screen" id="sc-e3">
+  <div class="s-eye exp">Section 3 of 4 · Classification</div>
+  <div class="s-title">Syndrome & Mechanism</div>
+  <div class="card">
+    <div class="card-lbl">MDT Syndrome<span class="sec-num">5</span></div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">Hefford (2008) κ = 0.60 — Derangement: DP + centralisation (50–78% of NSLBP). Dysfunction: end-range pain only. Postural: sustained posture only.</span></div>
+    <div id="exp-syn-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-lbl">Primary Pain Mechanism<span class="sec-num">6</span></div>
+    <div class="alert a-b"><span>ℹ</span><span style="font-size:0.72rem">Foster et al. (2013) — Select the PRIMARY driver of this patient's pain and disability.</span></div>
+    <div id="exp-mech-box"></div>
+  </div>
+</div>
+
+<!-- E4: Final Classification -->
+<div class="screen" id="sc-e4">
+  <div class="s-eye exp">Section 4 of 4 · Final Classification</div>
+  <div class="s-title">Your Stratification Decision</div>
+  <div class="s-sub">Based on your independent assessment, select ONE final classification pathway.</div>
+  <div class="card">
+    <div class="card-lbl">Red Flags / X-Ray<span class="sec-num">7</span></div>
+    <div id="exp-rf-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-lbl">Final Stratification Pathway<span class="sec-num">8</span></div>
+    <div id="exp-proto-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-lbl">Confidence<span class="sec-num">9</span></div>
+    <div id="exp-conf-box"></div>
+  </div>
+</div>
+
+<!-- E5: Saved -->
+<div class="screen" id="sc-e5">
+  <div class="s-eye exp">Assessment Complete</div>
+  <div class="s-title">Saved ✓</div>
+  <div class="saved-box">
+    <div class="saved-icon">✅</div>
+    <div class="saved-t">Assessment Recorded</div>
+    <div class="saved-s" id="saved-detail">Your independent assessment has been saved to the research database.</div>
+  </div>
+  <div class="card" style="margin-top:13px">
+    <div class="card-lbl">Your Submission Summary</div>
+    <div id="exp-summary"></div>
+  </div>
+</div>
+
 <!-- D1: McKenzie -->
 <div class="screen" id="sc-d1">
   <div class="s-eye doc">Step 1 of 3 · McKenzie MDT</div>
@@ -484,7 +696,19 @@ function toggleZone(id, label) {
   P.dist = selected || document.getElementById('p-dist').value;
 }
 const P = { name:'', age:'', gender:'', dur:'', pain:'', dist:'', rf:new Array(5).fill(null), start:new Array(9).fill(null), id:null };
+// ── RETEST STATE ──
+const R = { active:false, originalId:null, grc:null };
 const D = { dir:null, resp:null, overall:null, syndrome:null, mech:null, xray:new Set(), xrayAvail:null };
+
+// ── EXPERT STATE ──
+const E = {
+  raterId:null, raterName:'', years:'', qual:'', declared:false,
+  risk:null, dir:null, resp:null, overall:null,
+  syndrome:null, mech:null, redflag:null, xray:null,
+  proto:null, confidence:null,
+  startedAt:null
+};
+let eStep = 0;
 
 // ════════════════════════════════════
 // DATA
@@ -562,10 +786,351 @@ const xrayData = [
 ];
 
 // ════════════════════════════════════
+// EXPERT PORTAL DATA
+// ════════════════════════════════════
+const expRiskData = [
+  { id:'low',  c:'s-t', title:'LOW RISK', desc:'Total score 0–3. Good prognosis, low psychosocial burden.', ref:'Hill et al. (2008)' },
+  { id:'med',  c:'s-a', title:'MEDIUM RISK', desc:'Total ≥4, psychosocial subscale ≤3. Moderate disability.', ref:'Hill et al. (2008)' },
+  { id:'high', c:'s-r', title:'HIGH RISK', desc:'Total ≥4, psychosocial subscale ≥4. Psychosocial barriers dominant.', ref:'Hill et al. (2008)' },
+];
+
+const expRfData = [
+  { id:'none',    c:'s-t', title:'No Red Flags', desc:'No indicators of specific spinal pathology.', ref:'NICE NG59 (2020)' },
+  { id:'present', c:'s-r', title:'Red Flag Present', desc:'Suspected malignancy, fracture, infection, or cauda equina — referral indicated.', ref:'NICE NG59 (2020)' },
+  { id:'xray',    c:'s-r', title:'Vertebral Fracture on X-Ray', desc:'Fracture identified on imaging — referral indicated.', ref:'NICE NG59 (2020)' },
+];
+
+const expProtoData = [
+  { id:'P1a', c:'s-t', title:'P1a — Low Risk + DP Present', desc:'Low risk prognosis with identifiable directional preference.' },
+  { id:'P1b', c:'s-t', title:'P1b — Low Risk + No DP', desc:'Low risk prognosis, no mechanical responsiveness identified.' },
+  { id:'P2a', c:'s-b', title:'P2a — Medium Risk + Centralisation', desc:'Medium risk with positive centralisation response.' },
+  { id:'P2b', c:'s-a', title:'P2b — Medium Risk + Peripheralisation', desc:'Medium risk with peripheralisation on loading.' },
+  { id:'P3',  c:'s-a', title:'P3 — Medium Risk + No Change', desc:'Medium risk, no centralisation or peripheralisation.' },
+  { id:'P4',  c:'s-r', title:'P4 — High Risk', desc:'High risk prognosis, psychosocial barriers dominant.' },
+  { id:'REF', c:'s-r', title:'REF — Urgent Medical Referral', desc:'Red flag or fracture present.' },
+];
+
+const expConfData = [
+  { id:'very',   c:'s-t', title:'Very confident', desc:'Clear presentation, unambiguous classification.' },
+  { id:'fairly', c:'s-b', title:'Fairly confident', desc:'Reasonably clear, minor uncertainty.' },
+  { id:'uncert', c:'s-a', title:'Uncertain', desc:'Mixed or ambiguous presentation.' },
+];
+
+// ════════════════════════════════════
+// EXPERT PORTAL FLOW
+// ════════════════════════════════════
+function startExpert() {
+  mode='expert'; eStep=0;
+  E.startedAt = new Date().toISOString();
+  document.getElementById('mode-badge').className='mode-badge mode-e';
+  document.getElementById('mode-badge').textContent='EXPERT';
+  document.getElementById('hdr-tag').textContent='Blinded Rater';
+  document.getElementById('prog-bar').style.display='none';
+  document.getElementById('bot-bar').style.display='flex';
+  showScreen('sc-e0');
+  updateBot();
+}
+
+function pickRater(id) {
+  E.raterId = id;
+  document.getElementById('rb-E1').className = 'rater-btn' + (id==='E1'?' sel':'');
+  document.getElementById('rb-E2').className = 'rater-btn' + (id==='E2'?' sel':'');
+}
+
+function toggleDecl() {
+  E.declared = !E.declared;
+  document.getElementById('decl-box').className = 'sel' + (E.declared?' s-t':'');
+}
+
+async function loadForExpert() {
+  const errBox = document.getElementById('exp-id-error');
+  const errMsg = document.getElementById('exp-err-msg');
+  const show = (m) => { errMsg.textContent = m; errBox.style.display='flex'; };
+
+  if(!E.raterId){ show('Select your Rater ID (E1 or E2) first.'); return; }
+  const nm = document.getElementById('e-name').value.trim();
+  if(!nm){ show('Enter your full name.'); return; }
+  const yrs = document.getElementById('e-years').value;
+  if(!yrs || parseInt(yrs) < 5){ show('Minimum 5 years NSLBP experience required.'); return; }
+  const ql = document.getElementById('e-qual').value;
+  if(!ql){ show('Select your McKenzie qualification.'); return; }
+  if(!E.declared){ show('You must confirm the declaration of independence.'); return; }
+
+  const id = document.getElementById('exp-id-input').value.trim();
+  if(!id || id.length!==4){ show('Enter a valid 4-digit Session ID.'); return; }
+
+  E.raterName = nm; E.years = yrs; E.qual = ql;
+  errBox.style.display='none';
+
+  showScreen('sc-loading');
+  document.getElementById('loading-msg').textContent='Loading patient record...';
+
+  const sess = await supa.get('sessions', id);
+  if(!sess){
+    showScreen('sc-e0');
+    show('Session ID not found. Check the number.');
+    return;
+  }
+
+  // Check duplicate submission
+  const dup = await checkExpertDup(id, E.raterId);
+  if(dup){
+    showScreen('sc-e0');
+    show('You (' + E.raterId + ') have already submitted an assessment for this patient.');
+    return;
+  }
+
+  // Load ONLY patient-reported data — NEVER doctor findings or app output
+  P.name=sess.patient_name; P.age=sess.patient_age;
+  P.gender=sess.patient_gender; P.dur=sess.patient_duration;
+  P.pain=sess.patient_pain; P.dist=sess.patient_distribution;
+  P.rf=sess.red_flags; P.start=sess.start_answers;
+  P.id=id;
+
+  eStep=1;
+  document.getElementById('prog-bar').style.display='block';
+  showScreen('sc-e1');
+  renderProgE(); renderExpPtSum();
+  renderExpRisk(); renderExpDir(); renderExpResp(); renderExpOverall();
+  renderExpSyn(); renderExpMech(); renderExpRf(); renderExpProto(); renderExpConf();
+  updateBot();
+}
+
+async function checkExpertDup(sessionId, raterId) {
+  try {
+    const r = await fetch(`${SUPA_URL}/rest/v1/expert_ratings?session_id=eq.${sessionId}&rater_id=eq.${raterId}`, {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+    });
+    if(!r.ok) return false;
+    const d = await r.json();
+    return d.length > 0;
+  } catch(e) { return false; }
+}
+
+function renderProgE() {
+  const lbls = ['Patient','McKenzie','Classify','Final'];
+  let h='';
+  for(let i=1;i<=4;i++){
+    const done=i<eStep, active=i===eStep;
+    h+=`<div class="pd"><div class="pd-dot ${done?'e-done':active?'e-active':''}">${done?'✓':i}</div><div class="pd-lbl ${active?'e-active':''}">${lbls[i-1]}</div></div>`;
+    if(i<4) h+=`<div class="pd-con ${i<eStep?'e-done':''}"></div>`;
+  }
+  document.getElementById('prog-row').innerHTML=h;
+}
+
+function renderExpPtSum() {
+  const {total,sub} = calcStart();
+  const hasRF = P.rf && P.rf.some(a=>a==1);
+  const el = document.getElementById('exp-pt-sum');
+  if(!el) return;
+  el.innerHTML = `
+    <div class="blind-banner">
+      <div class="blind-title">🔒 BLINDED VIEW · RATER ${E.raterId}</div>
+      <div class="blind-text">Application output and co-rater assessments are hidden. Only patient-reported data is shown below.</div>
+    </div>
+    <div class="pt-sum">
+      <div class="pt-sum-head" style="color:var(--purple)">📋 Patient-Reported Data — ID: ${P.id}</div>
+      <div class="pt-sum-grid">
+        <div class="pt-sum-item"><div class="pt-sum-lbl">Name</div><div class="pt-sum-val">${P.name||'—'}</div></div>
+        <div class="pt-sum-item"><div class="pt-sum-lbl">Age / Sex</div><div class="pt-sum-val">${P.age||'—'} · ${P.gender||'—'}</div></div>
+        <div class="pt-sum-item"><div class="pt-sum-lbl">Duration</div><div class="pt-sum-val">${P.dur||'—'}</div></div>
+        <div class="pt-sum-item"><div class="pt-sum-lbl">NRS Pain</div><div class="pt-sum-val">${P.pain||'—'}/10</div></div>
+      </div>
+      <div class="pt-sum-item" style="margin-top:7px"><div class="pt-sum-lbl">Pain Distribution</div><div class="pt-sum-val" style="font-size:0.74rem">${P.dist||'—'}</div></div>
+      ${hasRF?'<div class="alert a-r" style="margin-top:9px"><span>🚩</span><span>Patient reported one or more red flag items</span></div>':''}
+      <div class="start-result">
+        <div><div class="start-score" style="color:var(--purple)">${total}/9</div><div style="font-size:0.56rem;color:var(--muted);font-family:monospace">Subscale: ${sub}/5</div></div>
+        <div><div class="start-risk-lbl" style="color:var(--purple)">STarT BACK (patient-reported)</div><div class="start-desc">Hill et al. (2008) · Arabic version: Eilayyan et al. (2025)</div></div>
+      </div>
+    </div>`;
+}
+
+const eSel = (boxId, data, key, renderFn) => {
+  const box = document.getElementById(boxId);
+  if(!box) return;
+  box.innerHTML = data.map(d=>`
+    <div class="sel ${E[key]===d.id?d.c:''}" onclick="E.${key}='${d.id}';${renderFn}()">
+      <div class="sel-radio"></div>
+      <div class="sel-body">
+        <div class="sel-title">${d.title}</div>
+        <div class="sel-desc">${d.desc}</div>
+        ${d.ref?`<div class="sel-ref">📚 ${d.ref}</div>`:''}
+      </div>
+    </div>`).join('');
+};
+
+function renderExpRisk()    { eSel('exp-risk-box', expRiskData, 'risk', 'renderExpRisk'); }
+function renderExpDir()     { eSel('exp-dir-box', dirData.map(d=>({...d,c:'s-t'})), 'dir', 'renderExpDir'); }
+function renderExpResp()    { eSel('exp-resp-box', respData, 'resp', 'renderExpResp'); }
+function renderExpOverall() { eSel('exp-overall-box', overallData, 'overall', 'renderExpOverall'); }
+function renderExpSyn()     { eSel('exp-syn-box', synData, 'syndrome', 'renderExpSyn'); }
+function renderExpMech()    { eSel('exp-mech-box', mechData, 'mech', 'renderExpMech'); }
+function renderExpRf()      { eSel('exp-rf-box', expRfData, 'redflag', 'renderExpRf'); }
+function renderExpProto()   { eSel('exp-proto-box', expProtoData, 'proto', 'renderExpProto'); }
+function renderExpConf()    { eSel('exp-conf-box', expConfData, 'confidence', 'renderExpConf'); }
+
+async function saveExpertRating() {
+  showScreen('sc-loading');
+  document.getElementById('loading-msg').textContent='Saving your assessment...';
+  document.getElementById('bot-bar').style.display='none';
+
+  const {total,sub} = calcStart();
+  const payload = {
+    session_id: P.id,
+    rater_id: E.raterId,
+    rater_name: E.raterName,
+    rater_years: parseInt(E.years),
+    rater_qualification: E.qual,
+    declaration_signed: true,
+    exp_risk: E.risk,
+    exp_dir: E.dir,
+    exp_response: E.resp,
+    exp_overall: E.overall,
+    exp_syndrome: E.syndrome,
+    exp_mechanism: E.mech,
+    exp_redflag: E.redflag,
+    exp_protocol: E.proto,
+    exp_confidence: E.confidence,
+    startback_total: total,
+    startback_sub: sub,
+    started_at: E.startedAt,
+    submitted_at: new Date().toISOString()
+  };
+
+  const ok = await supa.insert('expert_ratings', payload);
+
+  if(ok){
+    eStep=5;
+    document.getElementById('prog-bar').style.display='none';
+    document.getElementById('saved-detail').textContent =
+      `Rater ${E.raterId} · Patient ${P.id} · Saved ${new Date().toLocaleString('en-GB')}`;
+    renderExpSummary();
+    showScreen('sc-e5');
+    document.getElementById('bot-bar').style.display='flex';
+    document.getElementById('bot-bar').innerHTML =
+      `<button class="btn-new" onclick="location.reload()">🏠 Home</button>
+       <button class="btn-new" style="border-color:var(--purple);color:var(--purple)" onclick="nextPatientSameRater()">➕ Next Patient</button>`;
+  } else {
+    alert('Save failed — check your internet connection and try again.');
+    eStep=4; showScreen('sc-e4');
+    document.getElementById('bot-bar').style.display='flex';
+    renderProgE(); updateBot();
+  }
+}
+
+function renderExpSummary() {
+  const dirLbl  = (dirData.find(d=>d.id===E.dir)||{}).title || '—';
+  const respLbl = (respData.find(d=>d.id===E.resp)||{}).title || '—';
+  const synLbl  = (synData.find(d=>d.id===E.syndrome)||{}).title || '—';
+  const mechLbl = (mechData.find(d=>d.id===E.mech)||{}).title || '—';
+  const rows = [
+    ['Rater', E.raterId + ' — ' + E.raterName],
+    ['Patient Session', P.id],
+    ['Risk Classification', (E.risk||'—').toUpperCase()],
+    ['Directional Preference', dirLbl],
+    ['Symptom Response', respLbl],
+    ['MDT Syndrome', synLbl],
+    ['Primary Mechanism', mechLbl],
+    ['Final Pathway', E.proto || '—'],
+    ['Confidence', E.confidence || '—'],
+  ];
+  document.getElementById('exp-summary').innerHTML = rows.map(([k,v])=>
+    `<div class="sum-line"><span class="sum-k">${k}</span><span class="sum-v">${v}</span></div>`
+  ).join('');
+}
+
+function nextPatientSameRater() {
+  // Keep rater identity, clear assessment
+  E.risk=null; E.dir=null; E.resp=null; E.overall=null;
+  E.syndrome=null; E.mech=null; E.redflag=null; E.proto=null; E.confidence=null;
+  E.startedAt = new Date().toISOString();
+  eStep=0;
+  document.getElementById('exp-id-input').value='';
+  document.getElementById('exp-id-error').style.display='none';
+  document.getElementById('prog-bar').style.display='none';
+  document.getElementById('bot-bar').innerHTML =
+    `<button class="btn-back" id="btn-back" onclick="goBack()">← Back</button>
+     <button class="btn-exp" id="btn-next" onclick="goNext()">Next →</button>`;
+  showScreen('sc-e0');
+  updateBot();
+}
+
+// ════════════════════════════════════
+// RETEST FLOW
+// ════════════════════════════════════
+const grcData = [
+  { v:-3, c:'s-r', t:'أسوأ كثيراً',   e:'Much worse' },
+  { v:-2, c:'s-a', t:'أسوأ',          e:'Worse' },
+  { v:-1, c:'s-b', t:'أسوأ قليلاً',   e:'Slightly worse' },
+  { v: 0, c:'s-t', t:'لم يتغير',      e:'No change' },
+  { v: 1, c:'s-b', t:'أفضل قليلاً',   e:'Slightly better' },
+  { v: 2, c:'s-a', t:'أفضل',          e:'Better' },
+  { v: 3, c:'s-r', t:'أفضل كثيراً',   e:'Much better' },
+];
+
+function startRetest() {
+  mode='patient'; pStep=0; R.active=true; R.originalId=null; R.grc=null;
+  document.getElementById('mode-badge').className='mode-badge mode-p';
+  document.getElementById('mode-badge').textContent='RETEST';
+  document.getElementById('hdr-tag').textContent='إعادة التقييم';
+  document.getElementById('prog-bar').style.display='none';
+  document.getElementById('bot-bar').style.display='flex';
+  renderGRC();
+  showScreen('sc-r0');
+  updateBot();
+}
+
+function renderGRC() {
+  const box = document.getElementById('grc-box');
+  if(!box) return;
+  box.innerHTML = grcData.map(g=>`
+    <div class="sel ${R.grc===g.v?g.c:''}" onclick="R.grc=${g.v};renderGRC()">
+      <div class="sel-radio"></div>
+      <div class="sel-body">
+        <div class="sel-title">${g.t}</div>
+        <div class="sel-desc">${g.e} (${g.v>0?'+':''}${g.v})</div>
+      </div>
+    </div>`).join('');
+}
+
+async function verifyRetestId() {
+  const errBox = document.getElementById('retest-error');
+  const errMsg = document.getElementById('retest-err-msg');
+  const okBox  = document.getElementById('retest-found');
+  const okMsg  = document.getElementById('retest-found-msg');
+  const show = (m)=>{ errMsg.textContent=m; errBox.style.display='flex'; okBox.style.display='none'; };
+
+  const id = document.getElementById('retest-id-input').value.trim();
+  if(!id || id.length!==4){ show('أدخل رقم جلسة صحيح مكوّن من 4 أرقام'); return false; }
+  if(R.grc===null){ show('اختر مقياس التغير أولاً'); return false; }
+
+  const sess = await supa.get('sessions', id);
+  if(!sess){ show('لم يتم العثور على هذا الرقم'); return false; }
+  if(sess.is_retest){ show('هذا الرقم هو إعادة تقييم بالفعل — أدخل رقم الزيارة الأولى'); return false; }
+
+  // Check days elapsed
+  const days = Math.floor((Date.now() - new Date(sess.created_at)) / 86400000);
+  if(days < 3){ show(`مر ${days} يوم فقط — يجب الانتظار 3 أيام على الأقل`); return false; }
+  if(days > 7){ show(`مر ${days} يوم — تجاوز نافذة الـ 7 أيام. سجّل الحالة كمريض جديد.`); return false; }
+
+  R.originalId = id;
+  errBox.style.display='none';
+  okMsg.textContent = `تم العثور على: ${sess.patient_name || 'مريض'} · مر ${days} أيام`;
+  okBox.style.display='flex';
+
+  // Prefill demographics from original so patient doesn't retype
+  P.name = sess.patient_name; P.age = sess.patient_age;
+  P.gender = sess.patient_gender; P.dur = sess.patient_duration;
+  P.dist = sess.patient_distribution;
+  return true;
+}
+
+// ════════════════════════════════════
 // PATIENT FLOW
 // ════════════════════════════════════
 function startPatient() {
   mode='patient'; pStep=1;
+  R.active=false; R.originalId=null; R.grc=null;
   document.getElementById('mode-badge').className='mode-badge mode-p';
   document.getElementById('mode-badge').textContent='PATIENT';
   document.getElementById('hdr-tag').textContent='استبيان المريض';
@@ -640,16 +1205,26 @@ async function finishPatient() {
   const id=genID();
   P.id=id;
 
-  const ok=await supa.insert('sessions',{
+  const payload = {
     id, patient_name:P.name, patient_age:P.age,
     patient_gender:P.gender, patient_duration:P.dur,
     patient_pain:P.pain, patient_distribution:P.dist,
     red_flags:P.rf, start_answers:P.start,
     start_total:total, start_sub:sub, start_risk:risk
-  });
+  };
+  if(R.active && R.originalId){
+    payload.is_retest = true;
+    payload.retest_of = R.originalId;
+    payload.grc_score = R.grc;
+  }
+  const ok = await supa.insert('sessions', payload);
 
   if(ok) {
     document.getElementById('pt-id-display').textContent=id;
+    if(R.active){
+      const sub = document.querySelector('#sc-p4 .id-sub');
+      if(sub) sub.innerHTML = `إعادة تقييم مرتبطة بالجلسة <strong>${R.originalId}</strong><br>أعطِ هذا الرقم للمعالج`;
+    }
     pStep=4; showScreen('sc-p4');
     document.getElementById('prog-bar').style.display='none';
   } else {
@@ -971,6 +1546,22 @@ function buildResult() {
 // ════════════════════════════════════
 async function goNext() {
   if(mode==='patient'){
+    if(pStep===0){
+      // Retest entry screen
+      const ok = await verifyRetestId();
+      if(!ok) return;
+      pStep=1;
+      // Prefill the form fields
+      document.getElementById('p-name').value = P.name || '';
+      document.getElementById('p-age').value = P.age || '';
+      document.getElementById('p-gender').value = P.gender || '';
+      document.getElementById('p-dur').value = P.dur || '';
+      showScreen('sc-p1');
+      document.getElementById('prog-bar').style.display='block';
+      renderProgP();
+      updateBot();
+      return;
+    }
     if(pStep===1){
       if(!document.getElementById('p-name').value){alert('أدخل اسمك');return;}
       P.name=document.getElementById('p-name').value;
@@ -1004,6 +1595,26 @@ async function goNext() {
         <button class="btn-new" onclick="window.print()" style="border-color:var(--blue);color:var(--blue)">🖨 Print</button>`;
       return;
     }
+  } else if(mode==='expert'){
+    if(eStep===1){
+      if(!E.risk){alert('Select your risk classification');return;}
+      eStep=2; showScreen('sc-e2'); renderProgE();
+    } else if(eStep===2){
+      if(!E.dir){alert('Select directional preference');return;}
+      if(!E.resp){alert('Select symptom response');return;}
+      if(!E.overall){alert('Select overall interpretation');return;}
+      eStep=3; showScreen('sc-e3'); renderProgE();
+    } else if(eStep===3){
+      if(!E.syndrome){alert('Select MDT syndrome');return;}
+      if(!E.mech){alert('Select primary mechanism');return;}
+      eStep=4; showScreen('sc-e4'); renderProgE();
+    } else if(eStep===4){
+      if(!E.redflag){alert('Select red flag / X-ray status');return;}
+      if(!E.proto){alert('Select your final stratification pathway');return;}
+      if(!E.confidence){alert('Select your confidence level');return;}
+      await saveExpertRating();
+      return;
+    }
   }
   updateBot();
 }
@@ -1012,21 +1623,32 @@ function goBack() {
   if(mode==='patient'){
     if(pStep===2){pStep=1;showScreen('sc-p1');renderProgP();}
     else if(pStep===3){pStep=2;showScreen('sc-p2');renderProgP();}
+    else if(pStep===1 && R.active){
+      pStep=0; showScreen('sc-r0');
+      document.getElementById('prog-bar').style.display='none';
+      renderGRC();
+    }
     else{goHome();}
   } else if(mode==='doctor'){
     if(dStep===1){dStep=0;showScreen('sc-d0');document.getElementById('prog-bar').style.display='none';}
     else if(dStep===2){dStep=1;showScreen('sc-d1');renderProgD();renderPtSum('pt-sum-d1');renderDir();renderResp();renderOverall();}
     else if(dStep===3){dStep=2;showScreen('sc-d2');renderProgD();renderSyn();renderMech();}
     else if(dStep===4){dStep=3;showScreen('sc-d3');renderProgD();renderXray();
-      // Restore bot bar
       document.getElementById('bot-bar').innerHTML='<button class="btn-back" id="btn-back" onclick="goBack()">← Back</button><button class="btn-doc" id="btn-next" onclick="goNext()">Next →</button>';
     }
+  } else if(mode==='expert'){
+    if(eStep===1){eStep=0;showScreen('sc-e0');document.getElementById('prog-bar').style.display='none';}
+    else if(eStep===2){eStep=1;showScreen('sc-e1');renderProgE();renderExpPtSum();renderExpRisk();}
+    else if(eStep===3){eStep=2;showScreen('sc-e2');renderProgE();renderExpDir();renderExpResp();renderExpOverall();}
+    else if(eStep===4){eStep=3;showScreen('sc-e3');renderProgE();renderExpSyn();renderExpMech();}
+    else{goHome();}
   }
   updateBot();
 }
 
 function goHome(){
-  mode='home';pStep=0;dStep=0;
+  mode='home';pStep=0;dStep=0;eStep=0;
+  R.active=false;R.originalId=null;R.grc=null;
   document.getElementById('prog-bar').style.display='none';
   document.getElementById('bot-bar').style.display='none';
   showScreen('sc-home');
@@ -1044,11 +1666,18 @@ function updateBot(){
   bb.style.display='block';
   if(mode==='patient'){
     bn.className='btn-next';
-    bn.textContent=pStep===3?'إنهاء وأخذ الرقم ✓':'التالي ←';
-    bb.textContent=pStep===1?'← الرئيسية':'← رجوع';
+    if(pStep===0){ bn.textContent='تحقق ومتابعة ←'; bb.textContent='← الرئيسية'; }
+    else {
+      bn.textContent=pStep===3?'إنهاء وأخذ الرقم ✓':'التالي ←';
+      bb.textContent=(pStep===1 && !R.active)?'← الرئيسية':'← رجوع';
+    }
   } else if(mode==='doctor'){
     bn.className='btn-doc';
     bn.textContent=dStep===3?'Generate Result →':'Next →';
+    bb.textContent='← Back';
+  } else if(mode==='expert'){
+    bn.className='btn-exp';
+    bn.textContent=eStep===4?'Submit Assessment ✓':'Next →';
     bb.textContent='← Back';
   }
 }
